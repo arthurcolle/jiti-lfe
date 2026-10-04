@@ -1,0 +1,125 @@
+(in-package :image-agent/cli)
+(defstruct (chat (:constructor %make-chat)) controller model key base-url transport
+  (history nil) on-tool (tool-limit 20) (context-limit 65536))
+(defun make-chat (controller &key (model (image-agent::environment "OPENAI_MODEL"))
+                                  (key (image-agent::api-key))
+                                  (base-url (or (image-agent::environment "OPENAI_BASE_URL") "https://api.openai.com/v1"))
+                                  (transport #'image-agent::default-transport) on-tool (tool-limit 20) (context-limit 65536))
+  (unless (and (stringp model) (plusp (length model)) (stringp key) (plusp (length key))
+               (integerp tool-limit) (plusp tool-limit) (integerp context-limit) (>= context-limit 16384))
+    (error 'image-agent:configuration-error :message "Set OPENAI_MODEL and API credentials; tool limit must be positive"))
+  (%make-chat :controller controller :model model :key key :base-url base-url :transport transport
+              :tool-limit tool-limit :context-limit context-limit :on-tool on-tool))
+(defun completed-response (text)
+  "Use only the authoritative completed output, never partial argument deltas."
+  (unless (and (stringp text) (<= (length text) 1048576)) (error "Response exceeds limit"))
+  (let ((data nil) (response nil) (finished-items nil) (text-output (make-string-output-stream)))
+    (labels ((dispatch ()
+               (when data
+                 (when response (error "Data after completion"))
+                 (let* ((event (parse-json (format nil "~{~a~^~%~}" (nreverse data))))
+                        (type (gethash "type" event)))
+                   (cond ((equal type "response.output_item.done")
+                          (let ((item (gethash "item" event)))
+                            (unless (hash-table-p item) (error "Invalid completed item"))
+                            (push item finished-items)))
+                         ((equal type "response.output_text.delta")
+                          (write-string (gethash "delta" event) text-output))
+                         ((equal type "response.completed")
+                          (let ((r (gethash "response" event)))
+                            (unless (and (hash-table-p r) (equal (gethash "status" r) "completed")
+                                         (vectorp (gethash "output" r))) (error "Incomplete response"))
+                            (setf response r)))
+                         ((member type '("error" "response.failed" "response.incomplete"
+                                         "response.refusal.delta" "response.refusal.done") :test #'equal)
+                          (error "Failed response"))))
+                 (setf data nil))))
+      (with-input-from-string (s text)
+        (loop for raw = (read-line s nil nil) while raw
+              for line = (string-right-trim '(#\Return) raw) do
+          (cond ((zerop (length line)) (dispatch))
+                ((and (>= (length line) 5) (string= line "data:" :end1 5))
+                 (push (string-left-trim '(#\Space) (subseq line 5)) data)))))
+      (when (or data (null response)) (error "Missing completed response")))
+    ;; Underclass completes with an empty output array; its output_item.done records
+    ;; hold the full calls. They are eligible only after response.completed.
+    (when (zerop (length (gethash "output" response)))
+      (let ((items (nreverse finished-items)) (text (get-output-stream-string text-output)))
+        (when (and (plusp (length text))
+                   (not (find "message" items :key (lambda (item) (gethash "type" item)) :test #'equal)))
+          (setf items (append items (list (object "type" "message" "role" "assistant" "content"
+                                                  (vector (object "type" "output_text" "text" text)))))))
+        (setf (gethash "output" response) (coerce items 'vector))))
+    response))
+(defun message (role text) (object "role" role "content" text))
+(defun response-text (output)
+  (with-output-to-string (s)
+    (loop for item across output when (equal (gethash "type" item) "message") do
+      (loop for part across (gethash "content" item) do
+        (when (equal (gethash "type" part) "output_text") (write-string (gethash "text" part) s))))))
+(defun chat-instructions (chat)
+  (format nil "You operate a loaded Common Lisp world through registered tools. Observe before editing; never refer to IMAGE-AGENT or IMAGE-AGENT/CLI symbols. Goals and safety invariants belong to the caller. A paused frame retains live restarts across prompts; repairs are provisional until resumed. Accepted revisions persist, but observation generations are temporary concurrency tokens, NOT revision numbers. Roll back only when the user explicitly requests it; list revisions to resolve the target, clarify ambiguity, and call rollback_revision with a revision ID or number. Rollback unwinds any paused attempt and publishes a new revision; old stacks cannot be restored. Do not claim a change succeeded unless tool results establish it. Stop after fulfilling the request. Current state: ~a. Recent accepted revisions: ~a."
+          (json (view-json (controller-view (chat-controller chat))))
+          (json (subseq (history-json (chat-controller chat)) 0
+                        (min 8 (length (history-json (chat-controller chat))))))))
+(defun chat-turn (chat text)
+  (unless (and (stringp text) (plusp (length text)) (<= (length text) 16384))
+    (error "Provide 1 to 16384 characters"))
+  ;; Trim only at user-turn boundaries, when every prior call has a matching output.
+  (when (> (+ (length (json (coerce (chat-history chat) 'vector))) (length text)) (chat-context-limit chat))
+    (setf (chat-history chat) nil))
+  (setf (chat-history chat) (append (chat-history chat) (list (message "user" text))))
+  (let ((calls-used 0) (seen (make-hash-table :test 'equal)))
+    (dolist (item (chat-history chat))
+      (when (equal (gethash "type" item) "function_call")
+        (setf (gethash (gethash "call_id" item) seen) t)))
+    (loop
+      (when (> (length (json (coerce (chat-history chat) 'vector))) (chat-context-limit chat))
+        (setf (chat-history chat) nil)
+        (return "Context limit reached. Current state is preserved; continue with another prompt."))
+      (let* ((body (json (object "model" (chat-model chat) "stream" 'yason:true
+                                "parallel_tool_calls" 'yason:false
+                                "tools" (tool-definitions (controller-tools (chat-controller chat)))
+                                "instructions" (chat-instructions chat)
+                                "input" (coerce (chat-history chat) 'vector))))
+             (response (handler-case
+                           (completed-response (funcall (chat-transport chat)
+                             (concatenate 'string (string-right-trim "/" (chat-base-url chat)) "/responses")
+                             (chat-key chat) body))
+                         (error ()
+                           ;; The request may have had side effects at the provider, but local tools did not run.
+                           (return-from chat-turn "OpenAI request failed; no partial tool call was executed. You can retry."))))
+             (output (gethash "output" response))
+             (calls (remove-if-not (lambda (item) (equal (gethash "type" item) "function_call")) (coerce output 'list))))
+        ;; Validate all call identities before retaining or executing this response.
+        (unless (and (<= (length calls) 1)
+                     (every (lambda (call)
+                              (let ((id (gethash "call_id" call)))
+                                (and (stringp id) (plusp (length id)) (not (gethash id seen))
+                                     (stringp (gethash "name" call)) (stringp (gethash "arguments" call))))) calls))
+          (return "Invalid tool-call response; no tools were executed."))
+        (setf (chat-history chat) (append (chat-history chat) (coerce output 'list)))
+        (unless calls
+          (let ((text (response-text output)))
+            (return (if (plusp (length text)) text "OpenAI returned no text or tool calls."))))
+        (dolist (call calls)
+          (let* ((id (gethash "call_id" call))
+                 (result (if (>= calls-used (chat-tool-limit chat))
+                             (object "error" "Tool budget exhausted; no action executed")
+                             (handler-case
+                                 (progn (incf calls-used)
+                                        (dispatch-tool (controller-tools (chat-controller chat))
+                                                       (gethash "name" call) (parse-json (gethash "arguments" call))))
+                               (error () (object "error" "Tool failed or arguments invalid; inspect current state before retrying"))))))
+            (handler-case (json result)
+              (error () (setf result (object "error" "Tool result could not be encoded; inspect current state"))))
+            (setf (gethash id seen) t)
+            (setf (chat-history chat)
+                  (append (chat-history chat)
+                          (list (object "type" "function_call_output" "call_id" id "output" (json result)))))
+            (when (chat-on-tool chat)
+              (handler-case (funcall (chat-on-tool chat) (gethash "name" call) result)
+                (error () nil)))))
+        (when (or (>= calls-used (chat-tool-limit chat)) (terminal-p (controller-view (chat-controller chat))))
+          (return (format nil "Tool loop stopped (~d calls). Current state: ~a" calls-used
+                          (json (view-json (controller-view (chat-controller chat)))))))))))

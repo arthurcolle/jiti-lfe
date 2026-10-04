@@ -1,0 +1,7 @@
+(require :asdf)
+(push (truename (merge-pathnames "../" (make-pathname :name nil :type nil :defaults *load-truename*))) asdf:*central-registry*)
+(asdf:load-system "image-agent/cli")
+(handler-case (image-agent/cli:main (rest sb-ext:*posix-argv*))
+  (error (c)
+    (format *error-output* "REPL startup failed: ~a~%" c)
+    (sb-ext:exit :code 2)))

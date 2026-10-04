@@ -1,0 +1,7 @@
+(require :asdf)
+(push (truename "./") asdf:*central-registry*)
+(asdf:load-system "image-agent/tests")
+(let* ((mode (or (second sb-ext:*posix-argv*) "test"))
+       (seed (parse-integer (or (sb-ext:posix-getenv "TEST_SEED") "424242"))))
+  (format t "Mode ~a, seed ~d, SBCL ~a~%" mode seed (lisp-implementation-version))
+  (funcall (find-symbol "MAIN" "IMAGE-AGENT/TESTS") mode seed))
