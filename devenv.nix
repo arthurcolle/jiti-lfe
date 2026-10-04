@@ -4,6 +4,7 @@ let
   python = pkgs.python3.withPackages (p: [ p.pyyaml ]);
 in {
   packages = [ pkgs.git lisp python pkgs.coreutils ];
+  scripts.experiment-reverse.exec = ''python3 scripts/experiment.py "$@"'';
   scripts.image-repl.exec = ''python3 scripts/repl.py "$@"'';
   scripts.test.exec = "bash scripts/run-tests.sh test";
   scripts.test-stress.exec = ''TEST_SEED="''${TEST_SEED:-$(date +%s)}" bash scripts/run-tests.sh stress'';

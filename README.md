@@ -2,6 +2,26 @@
 
 A cooperative SBCL kernel for incrementally changing a running Lisp world. A worker retains a failed call's live restarts while an external controller evaluates repair forms or resumes the call. Accepted registered code and data can survive process restarts.
 
+Run a live evolution experiment:
+
+```sh
+devenv shell -- experiment-reverse
+```
+
+The Lisp process starts with no `reverse-string`, builds a prompt from its goal, and asks OpenAI to add the function through registered tools. Caller-owned tests verify 21 fixed Unicode examples and 1,000 generated cases. Lisp automatically prompts again on failure, bounded by three rounds, 20 tools per round, 100 worker actions, and a 600-second external watchdog. No reversal implementation is supplied to the live proposer.
+
+Success requires a freshly allocated output string on each invocation, unchanged input, and reversal of the **original logical grapheme clusters**. Emoji sequences and combining accents retain their internal code points. RTL/LTR rendering still follows Unicode bidi rules; directional controls are preserved as input units rather than rebalanced for display. Cluster boundaries can change after reversal, so universal double-reversal identity is deliberately not asserted. Generated expectations use the pinned SBCL UAX #29 segmentation; fixed examples have independent expected outputs. Unicode behavior follows that runtime, rather than promising a different Unicode release.
+
+The experiment prints actual outputs, expected outputs, and code points. It then launches a fresh SBCL process to execute the recovered function, rolls back to remove it, and restores the successful implementation into a new revision. Each run uses a fresh `.image-agent/experiments/reverse-TIME-PID/` workspace; `--store FRESH-DIRECTORY` selects another location, and `--seed INTEGER` changes the generated cases. Existing experiment stores are preserved and rejected for a new run.
+
+Artifacts include `experiment.txt`, the kernel journal and immutable revisions, `generated-source.lisp` containing the actual model-created definitions, and minimized failures under `counterexamples/`. To reproduce a failure offline:
+
+```sh
+devenv shell -- experiment-reverse --replay .image-agent/experiments/reverse-TIME-PID/counterexamples/failure-1.sexp
+```
+
+A reproduced failure exits with status 1; a passing replay exits with status 0. Replay evaluates the recorded managed definitions, so use trusted local artifacts. Credentials are resolved through the same local Underclass/environment configuration as the REPL and never written into experiment artifacts.
+
 Start the loaded-program CLI:
 
 ```sh
@@ -71,7 +91,7 @@ Load `image-agent` for the core, `image-agent/store` for persistence and the ref
 
 `session-step` returns `:idle`, `:paused`, `:success`, `:exhausted`, `:aborted`, or `:faulted`. Include the returned generation in every action. Paused views include temporary restart IDs; resume using `:action :resume :restart-id ID :arguments "(list ...)"`. `run` drives this protocol using an injected proposer. All attempts, including malformed actions and failed proposer requests, spend budget.
 
-A world supplies an evaluation package, bounded observation, checkpoint/restore, and optional durable export/import and definition-recording callbacks. An outer form and repairs made while it is paused share one provisional checkpoint. Failed repair evaluation aborts that entire attempt. Checkpoints precede reading, compilation, and evaluation. False goals permit accepted intermediate revisions; false or signaled safety invariants reject them. Empty goals are not allowed.
+A world supplies an evaluation package, bounded observation, checkpoint/restore, and optional durable export/import and definition-recording callbacks. An outer form and repairs made while it is paused share one provisional checkpoint. Failed repair evaluation aborts that entire attempt. Checkpoints precede reading, compilation, and evaluation. False goals permit accepted intermediate revisions; false or signaled safety invariants reject them. Noninteractive sessions require nonempty goals; interactive sessions may omit them. Autonomous evolution always requires executable goals.
 
 `make-property-check` returns a named check usable among goals or invariants. Provide a generator function taking a size, an assertion taking a sample, seed, case budget, and optional shrink function. Each sample and shrink test restores its world checkpoint. Results include seed, completed case count and counterexample. Model-created tests cannot replace the caller's acceptance contract.
 

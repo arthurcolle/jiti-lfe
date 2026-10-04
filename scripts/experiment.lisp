@@ -1,0 +1,7 @@
+(require :asdf)
+(push (truename (merge-pathnames "../" (make-pathname :name nil :type nil :defaults *load-truename*))) asdf:*central-registry*)
+(asdf:load-system "image-agent/experiments")
+(handler-case (image-agent/experiments:main (rest sb-ext:*posix-argv*))
+  (error (c)
+    (format *error-output* "Experiment failed: ~a~%" c)
+    (sb-ext:exit :code 2)))

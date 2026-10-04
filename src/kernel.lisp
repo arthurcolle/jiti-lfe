@@ -54,7 +54,7 @@
                (when (and (symbolp x)
                           (or (and (symbol-package x)
                                    (member (package-name (symbol-package x))
-                                           '("IMAGE-AGENT" "IMAGE-AGENT/CLI") :test #'equal))
+                                           '("IMAGE-AGENT" "IMAGE-AGENT/CLI" "IMAGE-AGENT/EXPERIMENTS") :test #'equal))
                               (member (symbol-name x)
                                       '("UNLOCK-PACKAGE" "WITHOUT-PACKAGE-LOCKS"
                                         "DISABLE-PACKAGE-LOCKS" "INVOKE-RESTART"
@@ -157,7 +157,12 @@
                             (evaluate-source s (or (getf action :arguments) "nil")))))
                     (unless (listp args) (throw 'abort-attempt :invalid-arguments))
                     (emit s :restart :id (getf action :restart-id))
-                    (apply #'invoke-restart (nth index restarts) args)))))
+                    ;; Errors before a restart transfers control occur inside our condition
+                    ;; handler, where the original handler cluster is inactive. Restore the
+                    ;; attempt rather than allowing argument/body errors to fault the worker.
+                    (handler-bind ((error (lambda (c) (declare (ignore c))
+                                           (throw 'abort-attempt :restart-failed))))
+                      (apply #'invoke-restart (nth index restarts) args))))))
              (:rollback (throw 'abort-attempt (list :rollback (getf action :revision))))
              ((:inspect :check) nil)
              (:abort (throw 'abort-attempt :aborted))
