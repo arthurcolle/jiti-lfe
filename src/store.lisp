@@ -21,6 +21,15 @@
           (loop for event = (handler-case (read stream nil eof) (error () (setf torn t) eof))
                 until (eq event eof) do (push event events)))))
     (values (nreverse events) torn)))
+(defun recover-operations (history)
+  (let ((records nil))
+    (dolist (event history)
+      (when (member (getf event :event) '(:operation-start :operation-finish))
+        (let ((record (copy-tree (getf event :record))))
+          (when (eq (getf record :status) :running) (setf (getf record :status) :interrupted))
+          (setf records (cons record (remove (getf record :id) records
+                                            :key (lambda (r) (getf r :id)) :test #'equal))))))
+    (subseq records 0 (min 100 (length records)))))
 (defun directory-path (path)
   (pathname (concatenate 'string (string-right-trim "/" (namestring (pathname path))) "/")))
 (defun boundary (name) (funcall *store-boundary-hook* name))
@@ -95,7 +104,7 @@
                                                 (get-universal-time) (incf *revision-counter*)) root)))
         (sb-posix:rename (namestring (merge-pathnames "events.sexp" root)) (namestring archive))
         (sync-directory root)))
-    (apply #'make-session world :store store :recovery-history (last history 8) options)))
+    (apply #'make-session world :store store :recovery-history (last history 8) :operation-history (recover-operations history) options)))
 
 (defun list-revisions (store)
   "Newest first; only the accepted CURRENT ancestry, never orphan artifacts."

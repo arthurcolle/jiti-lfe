@@ -32,11 +32,11 @@
   (multiple-value-bind (w s view) (fixture)
     (unwind-protect
         (progn
-          (setf view (send s view :action :evaluate :source "(progn (setf (gethash :x *state*) 4) (defun f (x) (+ x 7)))"))
+          (setf view (send s view :action :develop :source "(progn (setf (gethash :x *state*) 4) (defun f (x) (+ x 7)))"))
           (is (eq :idle (getf view :status)))
           (is (= 4 (gethash :x (image-agent:reference-table w))))
           (is (= 10 (function-value w)))
-          (setf view (send s view :action :evaluate :source "(progn (defun f (x) (+ x 100)) (setf (gethash :x *state*) -1))"))
+          (setf view (send s view :action :develop :source "(progn (defun f (x) (+ x 100)) (setf (gethash :x *state*) -1))"))
           (is (= 4 (gethash :x (image-agent:reference-table w))))
           (is (= 10 (function-value w))))
       (image-agent:close-session s))))
@@ -44,10 +44,10 @@
   (multiple-value-bind (w s v) (fixture)
     (unwind-protect
         (progn
-          (setf v (send s v :action :evaluate :source "(progn (declaim (notinline helper)) (defun helper () (error \"broken\")) (defun task () (list :old (restart-case (helper) (retry () (helper))) :old-exit)))"))
-          (setf v (send s v :action :evaluate :source "(setf (gethash :result *state*) (task))"))
+          (setf v (send s v :action :develop :source "(progn (declaim (notinline helper)) (defun helper () (error \"broken\")) (defun task () (list :old (restart-case (helper) (retry () (helper))) :old-exit)))"))
+          (setf v (send s v :action :develop :source "(setf (gethash :result *state*) (task))"))
           (is (eq :paused (getf v :status))) (cover :pause)
-          (setf v (send s v :action :evaluate :source "(progn (defun helper () 42) (defun task () :new))"))
+          (setf v (send s v :action :develop :source "(progn (defun helper () 42) (defun task () :new))"))
           (let ((r (find "RETRY" (getf v :restarts) :key (lambda (r) (getf r :name)) :test #'equal)))
             (setf v (send s v :action :resume :restart-id (getf r :id) :arguments "nil")))
           (is (equal '(:old 42 :old-exit) (gethash :result (image-agent:reference-table w))))
@@ -58,9 +58,9 @@
   (multiple-value-bind (w s v) (fixture)
     (unwind-protect
         (progn
-          (setf v (send s v :action :evaluate :source "(defun f (x) (+ x 1))"))
-          (setf v (send s v :action :evaluate :source "(progn (setf (gethash :x *state*) 7) (error \"pause\"))"))
-          (setf v (send s v :action :evaluate :source "(defun f (x) (+ x 99))"))
+          (setf v (send s v :action :develop :source "(defun f (x) (+ x 1))"))
+          (setf v (send s v :action :develop :source "(progn (setf (gethash :x *state*) 7) (error \"pause\"))"))
+          (setf v (send s v :action :develop :source "(defun f (x) (+ x 99))"))
           (setf v (send s v :action :abort))
           (is (= 0 (gethash :x (image-agent:reference-table w))))
           (is (= 4 (function-value w))) (cover :rollback))
@@ -69,7 +69,7 @@
   (multiple-value-bind (w s v) (fixture)
     (unwind-protect
         (progn
-          (setf v (send s v :action :evaluate :source "(restart-case (restart-case (error \"choose\") (same () (setf (gethash :x *state*) 11))) (same () (setf (gethash :x *state*) 22)) (nil () 3))"))
+          (setf v (send s v :action :develop :source "(restart-case (restart-case (error \"choose\") (same () (setf (gethash :x *state*) 11))) (same () (setf (gethash :x *state*) 22)) (nil () 3))"))
           (let* ((menu (getf v :restarts)) (old (getf (first menu) :id)))
             (is (= 2 (count "SAME" menu :key (lambda (r) (getf r :name)) :test #'equal)))
             (is (some (lambda (r) (null (getf r :name))) menu))
@@ -86,14 +86,14 @@
          (s (image-agent:make-session w :goals (list (cons :broken (lambda () (error "check failed")))) :budget 1)))
     (unwind-protect
         (let* ((v (image-agent:session-step s))
-               (last (send s v :action :evaluate :source "nil")))
+               (last (send s v :action :develop :source "nil")))
           (is (eq :exhausted (getf last :status))) (cover :exhausted))
       (image-agent:close-session s))))
 (test budget-during-pause
   (multiple-value-bind (w s v) (fixture (constantly nil) 1)
     (unwind-protect
         (progn
-          (setf v (send s v :action :evaluate :source "(progn (setf (gethash :x *state*) 9) (error \"stop\"))"))
+          (setf v (send s v :action :develop :source "(progn (setf (gethash :x *state*) 9) (error \"stop\"))"))
           (is (eq :exhausted (getf v :status)))
           (is (= 0 (gethash :x (image-agent:reference-table w)))))
       (image-agent:close-session s))))
@@ -105,36 +105,36 @@
           (loop for (op n) in commands do
             (decf remaining (case op ((:fail :fail-define :resume) 2) (:repair 3) (:stale 3) (otherwise 1)))
             (case op
-              (:set (setf v (send s v :action :evaluate :source
+              (:set (setf v (send s v :action :develop :source
                                   (format nil "(setf (gethash :x *state*) ~d)" n)))
                     (when (>= n 0) (setf expected n)))
-              (:define (setf v (send s v :action :evaluate :source
+              (:define (setf v (send s v :action :develop :source
                                      (format nil "(defun f (x) (+ x ~d))" (if *mutate-definitions* (1+ n) n))))
                        (setf offset n))
-              (:fail (setf v (send s v :action :evaluate :source
+              (:fail (setf v (send s v :action :develop :source
                                    (format nil "(progn (setf (gethash :x *state*) ~d) (error \"generated\"))" (abs n))))
                      (unless (eq :paused (getf v :status)) (return-from generated-history nil))
                      (setf v (send s v :action :abort)))
               (:fail-define
-               (setf v (send s v :action :evaluate :source
+               (setf v (send s v :action :develop :source
                     (format nil "(progn (defun f (x) (+ x ~d)) (error \"failed definition\"))" n)))
                (setf v (send s v :action :abort)))
               (:repair
-               (setf v (send s v :action :evaluate :source
+               (setf v (send s v :action :develop :source
                     (format nil "(progn (setf (gethash :x *state*) ~d) (restart-case (error \"repair\") (retry () (f 3))))" (abs n))))
-               (setf v (send s v :action :evaluate :source (format nil "(defun f (x) (+ x ~d))" n)))
+               (setf v (send s v :action :develop :source (format nil "(defun f (x) (+ x ~d))" n)))
                (if (minusp n)
                    (setf v (send s v :action :abort))
                    (progn
                      (setf v (send s v :action :resume :restart-id (getf (first (getf v :restarts)) :id) :arguments "nil"))
                      (setf offset n expected n))))
               (:stale
-               (setf v (send s v :action :evaluate :source "(restart-case (error \"stale\") (use () nil))"))
+               (setf v (send s v :action :develop :source "(restart-case (error \"stale\") (use () nil))"))
                (setf v (send s v :action :resume :restart-id "expired" :arguments "nil"))
                (unless (eq :paused (getf v :status)) (return-from generated-history nil))
                (setf v (send s v :action :abort)))
               (:invalid (setf v (send s v :action :claimed-success)))
-              (:resume (setf v (send s v :action :evaluate :source
+              (:resume (setf v (send s v :action :develop :source
                                      "(restart-case (error \"resume\") (use (x) (setf (gethash :x *state*) x)))"))
                        (let ((restart (first (getf v :restarts))))
                          (setf v (send s v :action :resume :restart-id (getf restart :id)
@@ -194,13 +194,13 @@
              (delete-package package))))
         (:response
          (let* ((form (format nil "(+ ~d 1)" input))
-                (text (image-agent::json-text (image-agent::json-object "action" "evaluate" "source" form))))
+                (text (image-agent::json-text (image-agent::json-object "action" "develop" "source" form))))
            (and (equal form (getf (image-agent:parse-sse (sse text)) :source))
                 (raises-error-p (lambda () (image-agent:parse-sse (sse text nil)))))))
         (:chunks
          (destructuring-bind (number lengths) input
            (let* ((form (format nil "(list ~s ~d)" "λ🍋" number))
-                  (text (sse (image-agent::json-text (image-agent::json-object "action" "evaluate" "source" form))))
+                  (text (sse (image-agent::json-text (image-agent::json-object "action" "develop" "source" form))))
                   (bytes (babel:string-to-octets text :encoding :utf-8))
                   (position 0)
                   (parts (loop for size in lengths while (< position (length bytes))
@@ -246,7 +246,7 @@
           (if complete (format nil "data: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\"}}~%~%") "")))
 (test generated-response-parsing
   (dotimes (i *pure-trials*) (exercise-property :response (random 10000)))
-  (dolist (text '("" "prose" "{\"action\":\"done\"}" "{\"action\":\"evaluate\",\"source\":\"nil\",\"extra\":1}"))
+  (dolist (text '("" "prose" "{\"action\":\"done\"}" "{\"action\":\"develop\",\"source\":\"nil\",\"extra\":1}"))
     (signals error (image-agent:parse-action text))))
 (test injected-transport
   (let ((proposer (image-agent:make-openai-proposer :model "test" :key "secret"
@@ -256,14 +256,14 @@
                                  (let ((request (yason:parse body)))
                                    (is (gethash "stream" request))
                                    (is (listp (gethash "input" request))))
-                                 (sse "{\"action\":\"evaluate\",\"source\":\"nil\"}")))))
-    (is (eq :evaluate (getf (funcall proposer '(:goal "test")) :action)))))
+                                 (sse "{\"action\":\"develop\",\"source\":\"nil\"}")))))
+    (is (eq :develop (getf (funcall proposer '(:goal "test")) :action)))))
 (test durable-code-and-data
   (let ((store (temp-store)))
     (multiple-value-bind (w s v) (fixture (constantly nil) 10 store)
       (unwind-protect
           (progn
-            (setf v (send s v :action :evaluate :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 17)))"))
+            (setf v (send s v :action :develop :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 17)))"))
             (image-agent:close-session s)
             (let* ((fresh (image-agent:make-reference-world))
                    (recovered (image-agent:recover-session fresh store :goals (list (cons :done (constantly nil))))))
@@ -281,7 +281,7 @@
           (unwind-protect
               (progn
                 (setf image-agent:*store-boundary-hook* (lambda (p) (when (eq p point) (error "fault"))))
-                (setf v (send s v :action :evaluate :source "(setf (gethash :x *state*) 9)"))
+                (setf v (send s v :action :develop :source "(setf (gethash :x *state*) 9)"))
                 (setf image-agent:*store-boundary-hook* old)
                 (let ((fresh (image-agent:make-reference-world)))
                   (image-agent:load-revision fresh store)
@@ -295,14 +295,18 @@
         (*pure-trials* (if (equal mode "stress") 10000 1000))
         (check-it:*list-size* 40)
         (*crash-trials* (if (equal mode "stress") 200 20)))
-    (cond ((equal mode "live") (live-test) (cli-live-test))
+    (cond ((equal mode "live") (live-test) (cli-live-test) (composition-live-test) (removal-live-test) (context-live-test))
           ((equal mode "replay")
            (let* ((file (third sb-ext:*posix-argv*)) (record (image-agent::read-record file)))
-             (unless (if (eq (getf record :kind) :pure)
+             (unless (if (eq (getf record :kind) :context-history)
+                         (context-history-p (getf record :trace))
+                         (if (eq (getf record :kind) :pure)
                          (pure-property-passes-p (getf record :property) (getf record :trace))
                          (if (eq (getf record :kind) :rollback-history)
                              (rollback-history-p (getf record :trace))
-                             (generated-history (getf record :trace))))
+                             (if (eq (getf record :kind) :composition-history)
+                                 (composition-history-p (getf record :trace))
+                                 (generated-history (getf record :trace))))))
                (error "Replay failed"))))
           (t (unless (run! 'kernel) (sb-ext:exit :code 1))
              (dolist (category '(:pause :repair :rollback :stale :exhausted :fail :define :set :resume :recovery :process-recovery))
@@ -369,7 +373,7 @@
     (multiple-value-bind (w s v) (fixture (constantly nil) 10 store)
       (unwind-protect
           (progn
-            (setf v (send s v :action :evaluate :source "(setf (gethash :x *state*) 3)"))
+            (setf v (send s v :action :develop :source "(setf (gethash :x *state*) 3)"))
             (image-agent:close-session s)
             (with-open-file (stream (merge-pathnames "events.sexp" store) :direction :output :if-exists :append)
               (write-string "(:event :action :proposal (" stream))
@@ -395,7 +399,7 @@
         (progn
           (signals error (image-agent:make-session w :goals (list (cons :never (constantly nil)))))
           (setf (image-agent:world-restore w) (lambda (snap) (declare (ignore snap)) (error "restore failed")))
-          (setf v (send s v :action :evaluate :source "(progn (setf (gethash :x *state*) 99) (error \"pause\"))"))
+          (setf v (send s v :action :develop :source "(progn (setf (gethash :x *state*) 99) (error \"pause\"))"))
           (setf v (send s v :action :abort))
           (is (eq :faulted (getf v :status))))
       (setf (image-agent:world-restore w) original) (image-agent:close-session s))))
@@ -405,7 +409,7 @@
                   (lambda () (= 1 (gethash :x (image-agent:reference-table w))))))))
          (v (image-agent:session-step s)))
     (unwind-protect
-        (is (eq :success (getf (send s v :action :evaluate :source "(setf (gethash :x *state*) 1)") :status)))
+        (is (eq :success (getf (send s v :action :develop :source "(setf (gethash :x *state*) 1)") :status)))
       (image-agent:close-session s))))
 (test oracle-detects-mutation-and-shrinks
   ;; Deliberately wrong emitted function checks that the oracle is independent.
@@ -443,7 +447,7 @@
            (v (image-agent:session-step s)))
       (unwind-protect
           (progn
-            (setf v (send s v :action :evaluate :source "(setf (gethash :x *state*) 5)"))
+            (setf v (send s v :action :develop :source "(setf (gethash :x *state*) 5)"))
             (is (= 5 (gethash :x (image-agent:reference-table fresh))))
             (is (not (nth-value 1 (image-agent::journal-history store))))
             (is (not (null (directory (merge-pathnames "events-torn-*.sexp" store))))))
@@ -453,7 +457,7 @@
     (unwind-protect
         (progn
           (setf (image-agent:world-record-form w) (lambda (form) (declare (ignore form)) (error "recorder failed")))
-          (setf v (send s v :action :evaluate :source "(setf (gethash :x *state*) 99)"))
+          (setf v (send s v :action :develop :source "(setf (gethash :x *state*) 99)"))
           (is (eq :faulted (getf v :status)))
           (is (= 0 (gethash :x (image-agent:reference-table w)))))
       (image-agent:close-session s))))

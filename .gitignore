@@ -24,3 +24,6 @@ devenv.local.yaml
 .image-agent/
 *.fasl
 __pycache__/
+
+# Rebuildable launch media (sources and scripts live in launch/).
+artifacts/launch/

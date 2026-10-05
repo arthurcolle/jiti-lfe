@@ -313,7 +313,7 @@
              (control (image-agent/cli:make-controller session)))
         (unwind-protect
             (progn
-              (controller-action control :evaluate :source (format nil "(progn ~{~a~%~})" (getf record :definitions)))
+              (controller-action control :develop :source (format nil "(progn ~{~a~%~})" (getf record :definitions)))
               (format output "Replay ~a: ~s~%" file last-result)
               (if (getf last-result :passed) :passed :reproduced))
           (image-agent:close-session session))))))

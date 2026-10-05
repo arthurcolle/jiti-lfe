@@ -2,8 +2,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mode=${1:-test}
+default_timeout=180
 shift || true
 if [[ "$mode" == live ]]; then
+  default_timeout=600
   # Underclass development profile; user-supplied environment always wins.
   if [[ -f "$HOME/.codex/config.toml" ]]; then
     export OPENAI_MODEL="${OPENAI_MODEL:-$(python3 -c 'import tomllib,pathlib; print(tomllib.loads((pathlib.Path.home()/".codex/config.toml").read_text()).get("model", ""))')}"
@@ -17,4 +19,4 @@ if [[ "$mode" == live ]]; then
     exit 2
   fi
 fi
-exec timeout "${TEST_TIMEOUT:-180}" sbcl --noinform --script scripts/test.lisp "$mode" "$@"
+exec timeout "${TEST_TIMEOUT:-$default_timeout}" sbcl --noinform --script scripts/test.lisp "$mode" "$@"

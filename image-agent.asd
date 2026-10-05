@@ -9,10 +9,12 @@
   :components ((:file "src/openai")))
 (asdf:defsystem "image-agent/cli"
   :depends-on ("image-agent/store" "image-agent/openai") :serial t
-  :components ((:file "src/tools") (:file "src/chat") (:file "src/cli")))
+  :components ((:file "src/tools") (:file "src/chat") (:file "src/context") (:file "src/cli")))
+(asdf:defsystem "image-agent/terminal"
+  :depends-on ("image-agent/cli") :components ((:file "src/terminal")))
 (asdf:defsystem "image-agent/experiments"
   :depends-on ("image-agent/cli")
   :components ((:file "src/experiments")))
 (asdf:defsystem "image-agent/tests"
   :depends-on ("image-agent/store" "image-agent/experiments" "fiveam" "check-it")
-  :serial t :components ((:file "tests/suite") (:file "tests/cli-suite") (:file "tests/experiment-suite")))
+  :serial t :components ((:file "tests/suite") (:file "tests/cli-suite") (:file "tests/experiment-suite") (:file "tests/composition-suite") (:file "tests/context-suite")))

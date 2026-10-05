@@ -1,8 +1,8 @@
 (in-package :image-agent/tests)
 (in-suite kernel)
-(defun interactive-fixture (&optional (budget 1000))
+(defun interactive-fixture (&optional (budget 1000) (store (temp-store)))
   (let* ((w (image-agent:make-reference-world :initial '((:x . 0))))
-         (s (image-agent:make-session w :interactive t :store (temp-store) :budget budget
+         (s (image-agent:make-session w :interactive t :store store :budget budget
                  :goals (list (cons :zero (lambda () (= 0 (gethash :x (image-agent:reference-table w))))))
                  :invariants (list (cons :safe (lambda () (>= (gethash :x (image-agent:reference-table w)) 0))))))
          (c (image-agent/cli:make-controller s)))
@@ -17,7 +17,7 @@
           (is (eq :idle (getf (image-agent/cli:controller-view c) :status)))
           (is (getf (image-agent/cli:controller-view c) :goals-achieved))
           (is (raises-error-p (lambda () (image-agent:rollback-revision s "previous"))))
-          (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 8)))")
+          (cli-action c :develop :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 8)))")
           (let ((prior (getf (image-agent/cli:controller-view c) :revision)))
             (cli-action c :rollback :revision "1")
             (is (= 0 (gethash :x (image-agent:reference-table w))))
@@ -26,7 +26,7 @@
               (is (= 3 (getf (first history) :sequence)))
               (is (equal prior (getf (first history) :parent)))
               (is (equal (getf (third history) :id) (getf (first history) :rollback-source)))))
-          (cli-action c :evaluate :source "(setf (gethash :x *state*) 4)")
+          (cli-action c :develop :source "(setf (gethash :x *state*) 4)")
           (is (= 4 (gethash :x (image-agent:reference-table w))))
           (cli-action c :abort)
           (is (eq :idle (getf (image-agent/cli:controller-view c) :status))))
@@ -35,8 +35,8 @@
   (multiple-value-bind (w s c) (interactive-fixture)
     (unwind-protect
         (progn
-          (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 3) (defun f (x) (+ x 3)))")
-          (cli-action c :evaluate :source "(unwind-protect (progn (setf (gethash :x *state*) 99) (restart-case (error \"paused\") (use () 42))) (setf (gethash :x *state*) 888))")
+          (cli-action c :develop :source "(progn (setf (gethash :x *state*) 3) (defun f (x) (+ x 3)))")
+          (cli-action c :develop :source "(unwind-protect (progn (setf (gethash :x *state*) 99) (restart-case (error \"paused\") (use () 42))) (setf (gethash :x *state*) 888))")
           (let* ((old (copy-list (image-agent/cli:controller-view c)))
                  (restart (getf (first (getf old :restarts)) :id)))
             (is (eq :paused (getf old :status)))
@@ -57,7 +57,7 @@
     (multiple-value-bind (w s c) (interactive-fixture)
       (unwind-protect
           (progn
-            (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 8)))")
+            (cli-action c :develop :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 8)))")
             (let ((old image-agent:*store-boundary-hook*))
               (unwind-protect
                   (progn (setf image-agent:*store-boundary-hook* (lambda (p) (when (eq p point) (error "publication fault"))))
@@ -74,7 +74,7 @@
   (multiple-value-bind (w s c) (interactive-fixture)
     (unwind-protect
         (progn
-          (cli-action c :evaluate :source "(setf (gethash :x *state*) 9)")
+          (cli-action c :develop :source "(setf (gethash :x *state*) 9)")
           (let ((original (image-agent:world-import w)))
             (setf (image-agent:world-import w)
                   (lambda (dir) (declare (ignore dir)) (setf (gethash :x (image-agent:reference-table w)) 77) (error "bad import")))
@@ -109,11 +109,11 @@
                           (let ((request (image-agent/cli::parse-json body)))
                             (push request requests)
                             (is (eq 'yason:false (gethash "parallel_tool_calls" request)))
-                            (is (= 7 (length (gethash "tools" request)))))
+                            (is (= 10 (length (gethash "tools" request)))))
                           (incf step)
                           (case step
                             (1 (native-sse (image-agent/cli::object "type" "reasoning" "id" "rs_test" "summary" #())
-                                 (native-call "one" "evaluate_form" "source" "(setf (gethash :x *state*) 7)"
+                                 (native-call "one" "develop_form" "source" "(setf (gethash :x *state*) 7)"
                                               "generation" (getf (image-agent/cli:controller-view c) :generation))))
                             (2 (native-sse (native-message "Changed it.")))
                             (3 (native-sse (native-call "two" "rollback_revision" "revision" "1"
@@ -136,7 +136,7 @@
         (progn
           (dolist (response (list
                     "data: {\"type\":\"response.function_call_arguments.delta\",\"delta\":\"partial\"}\n\n"
-                    (native-sse (native-call "one" "evaluate_form" "source" "(setf (gethash :x *state*) 99)" "generation" 1)
+                    (native-sse (native-call "one" "develop_form" "source" "(setf (gethash :x *state*) 99)" "generation" 1)
                                 (native-call "two" "abort_attempt" "generation" 1))))
             (let ((chat (image-agent/cli:make-chat c :model "fake" :key "secret"
                           :transport (lambda (&rest args) (declare (ignore args)) response))))
@@ -144,15 +144,15 @@
               (is (= 0 (gethash :x (image-agent:reference-table w))))))
           (let* ((step 0) (chat (image-agent/cli:make-chat c :model "fake" :key "secret" :tool-limit 2
                                 :transport (lambda (&rest args) (declare (ignore args))
-                                  (native-sse (native-call (format nil "call-~d" (incf step)) "observe_world"))))))
+                                  (native-sse (native-call (format nil "call-~d" (incf step)) "inspect_world" "offset" 0))))))
             (is (search "2 calls" (image-agent/cli:chat-turn chat "Inspect")))
             (is (= 2 step))
             (is (equal "function_call_output" (gethash "type" (car (last (image-agent/cli::chat-history chat)))))))
           (let ((tools (image-agent/cli:controller-tools c)))
             (is (raises-error-p (lambda () (image-agent/cli:dispatch-tool tools "unknown" (image-agent/cli::object)))))
-            (is (raises-error-p (lambda () (image-agent/cli:dispatch-tool tools "evaluate_form"
+            (is (raises-error-p (lambda () (image-agent/cli:dispatch-tool tools "develop_form"
                                             (image-agent/cli::object "source" "nil" "generation" "1")))))
-            (is (raises-error-p (lambda () (image-agent/cli:dispatch-tool tools "observe_world"
+            (is (raises-error-p (lambda () (image-agent/cli:dispatch-tool tools "inspect_world"
                                             (image-agent/cli::object "extra" 1)))))))
       (image-agent:close-session s))))
 (test scripted-terminal-and-adapter-identity
@@ -187,25 +187,29 @@
                   (case op
                     (:edit
                      (let ((value (abs n)))
-                       (cli-action c :evaluate :source (format nil "(progn (setf (gethash :x *state*) ~d) (defun f (x) (+ x ~d)))" value value))
-                       (setf expected (list value value) states (append states (list expected)))))
+                       (cli-action c :develop :source (format nil "(progn (setf (gethash :x *state*) ~d) (defun f (x) (+ x ~d)))" value value))
+                       (unless (equal expected (list value value))
+                         (setf states (append states (list (list value value)))))
+                       (setf expected (list value value))))
                     ((:rollback :paused-rollback)
                      (let* ((target (1+ (mod (abs n) (length states)))) (old-state (nth (1- target) states)))
                        (when (eq op :paused-rollback)
-                         (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 999) (defun f (x) (+ x 999)) (restart-case (error \"pause\") (use () nil)))"))
+                         (cli-action c :develop :source "(progn (setf (gethash :x *state*) 999) (defun f (x) (+ x 999)) (restart-case (error \"pause\") (use () nil)))"))
                        (cli-action c :rollback :revision (princ-to-string target))
                        (setf expected old-state states (append states (list expected)))))
                     (:stale
                      (image-agent/cli::controller-action c (image-agent/cli::object "generation" -1) :rollback :revision "1"))
                     (:invalid (cli-action c :rollback :revision "not-a-revision"))
                     (:abort
-                     (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 999) (defun f (x) (+ x 999)) (error \"pause\"))")
+                     (cli-action c :develop :source "(progn (setf (gethash :x *state*) 999) (defun f (x) (+ x 999)) (error \"pause\"))")
                      (cli-action c :abort))
                     (:resume
                      (let ((value (abs n)))
-                       (cli-action c :evaluate :source (format nil "(progn (defun f (x) (+ x ~d)) (restart-case (error \"resume\") (use () (setf (gethash :x *state*) ~d))))" value value))
+                       (cli-action c :develop :source (format nil "(progn (defun f (x) (+ x ~d)) (restart-case (error \"resume\") (use () (setf (gethash :x *state*) ~d))))" value value))
                        (cli-action c :resume :restart-id (getf (first (getf (image-agent/cli:controller-view c) :restarts)) :id) :arguments "nil")
-                       (setf expected (list value value) states (append states (list expected))))))
+                       (unless (equal expected (list value value))
+                         (setf states (append states (list (list value value)))))
+                       (setf expected (list value value)))))
                   (unless (and (= (first expected) (gethash :x (image-agent:reference-table w)))
                                (equal (and (second expected) (+ 3 (second expected))) (function-value w))
                                (= (length states) (length (image-agent:list-revisions (image-agent:session-store s))))
@@ -238,8 +242,8 @@
     (declare (ignore w))
     (unwind-protect
         (progn
-          (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 3) (defun f (x) (+ x 3)))")
-          (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 8)))")
+          (cli-action c :develop :source "(progn (setf (gethash :x *state*) 3) (defun f (x) (+ x 3)))")
+          (cli-action c :develop :source "(progn (setf (gethash :x *state*) 8) (defun f (x) (+ x 8)))")
           ;; Simulate manifests written by the previous implementation.
           (dolist (record (image-agent:list-revisions (image-agent:session-store s)))
             (let* ((path (merge-pathnames (format nil "~a/manifest.sexp" (getf record :id))
@@ -278,7 +282,7 @@
           (format t "Underclass native tools: mutation and history-preserving rollback succeeded~%"))
       (image-agent:close-session s))))
 (test underclass-completed-item-fallback
-  (let* ((call (native-call "proxy" "evaluate_form" "source" "nil" "generation" 1))
+  (let* ((call (native-call "proxy" "develop_form" "source" "nil" "generation" 1))
          (events (format nil "data: ~a~%~%data: ~a~%~%"
                    (image-agent/cli::json (image-agent/cli::object "type" "response.output_item.done" "item" call))
                    (image-agent/cli::json (image-agent/cli::object "type" "response.completed" "response"
@@ -296,18 +300,18 @@
   (multiple-value-bind (w s c) (interactive-fixture 2)
     (unwind-protect
         (progn
-          (cli-action c :evaluate :source "(setf (gethash :x *state*) 7)")
+          (cli-action c :develop :source "(setf (gethash :x *state*) 7)")
           (cli-action c :rollback :revision "1")
           (is (eq :exhausted (getf (image-agent/cli:controller-view c) :status)))
           (is (= 0 (gethash :x (image-agent:reference-table w))))
           (is (= 3 (length (image-agent:list-revisions (image-agent:session-store s)))))
-          (is (raises-error-p (lambda () (cli-action c :evaluate :source "nil")))))
+          (is (raises-error-p (lambda () (cli-action c :develop :source "nil")))))
       (image-agent:close-session s))))
 (test transport-and-context-preserve-paused-world
   (multiple-value-bind (w s c) (interactive-fixture)
     (unwind-protect
         (progn
-          (cli-action c :evaluate :source "(progn (setf (gethash :x *state*) 9) (restart-case (error \"pause\") (use () nil)))")
+          (cli-action c :develop :source "(progn (setf (gethash :x *state*) 9) (restart-case (error \"pause\") (use () nil)))")
           (let* ((view (image-agent/cli:controller-view c))
                  (chat (image-agent/cli:make-chat c :model "fake" :key "never-print-this"
                          :transport (lambda (&rest args) (declare (ignore args)) (error "never-print-this")))))
@@ -319,11 +323,16 @@
             (setf (image-agent/cli::chat-context-limit chat) 16384
                   (image-agent/cli::chat-transport chat)
                   (lambda (url key body)
-                    (declare (ignore url key))
-                    (let ((request (image-agent/cli::parse-json body)))
-                      (is (= 1 (length (gethash "input" request))))
-                      (is (search "paused" (gethash "instructions" request))))
-                    (native-sse (native-message "Still paused."))))
+                    (declare (ignore key))
+                    (cond ((search "/responses/compact" url)
+                           (error 'image-agent::responses-error :kind :unsupported))
+                          ((search "Summarize this conversation" body)
+                           (native-sse (native-message "{\"goal\":[\"Inspect the paused world\"],\"constraints\":[],\"decisions\":[],\"verified_progress\":[],\"unfinished_work\":[\"Inspect\"]}")))
+                          (t
+                           (let ((request (image-agent/cli::parse-json body)))
+                             (is (= 2 (length (gethash "input" request))))
+                             (is (search "paused" (gethash "instructions" request))))
+                           (native-sse (native-message "Still paused."))))))
             (is (equal "Still paused." (image-agent/cli:chat-turn chat "inspect")))
             (is (eq view (image-agent/cli:controller-view c))))
           (cli-action c :abort)
@@ -333,11 +342,11 @@
   (multiple-value-bind (w s c) (interactive-fixture)
     (unwind-protect
         (progn
-          (cli-action c :evaluate :source "(progn nil (setf image-agent/cli::chat-tool-limit 999))")
+          (cli-action c :develop :source "(progn nil (setf image-agent/cli::chat-tool-limit 999))")
           (is (eq :restored (getf (getf (image-agent/cli:controller-view c) :outcome) :commit)))
           (let ((chat (image-agent/cli:make-chat c :model "fake" :key "secret" :tool-limit 5
                         :transport (lambda (&rest args) (declare (ignore args))
-                          (native-sse (native-call "repeated" "evaluate_form" "source" "(incf (gethash :x *state*))"
+                          (native-sse (native-call "repeated" "develop_form" "source" "(incf (gethash :x *state*))"
                                                   "generation" (getf (image-agent/cli:controller-view c) :generation)))))))
             (is (search "Invalid tool-call" (image-agent/cli:chat-turn chat "increment once")))
             (is (= 1 (gethash :x (image-agent:reference-table w))))
@@ -346,18 +355,18 @@
       (image-agent:close-session s))))
 (defun native-property-p (number)
   (let* ((source (format nil "(list ~s ~d)" "λ🍋" number))
-         (call (native-call "generated" "evaluate_form" "source" source "generation" number))
+         (call (native-call "generated" "develop_form" "source" source "generation" number))
          (response (image-agent/cli::completed-response (native-sse call)))
          (args (image-agent/cli::parse-json (gethash "arguments" (aref (gethash "output" response) 0))))
-         (tool (image-agent/cli:make-tool :name "evaluate_form" :description "fixture"
+         (tool (image-agent/cli:make-tool :name "develop_form" :description "fixture"
                  :schema (image-agent/cli::schema "source" "string" "generation" "integer")
                  :handler (lambda (a) (gethash "source" a)))))
-    (and (equal source (image-agent/cli:dispatch-tool (list tool) "evaluate_form" args))
+    (and (equal source (image-agent/cli:dispatch-tool (list tool) "develop_form" args))
          (raises-error-p (lambda () (image-agent/cli::completed-response
               (format nil "data: ~a~%~%" (image-agent/cli::json
                 (image-agent/cli::object "type" "response.output_item.done" "item" call))))))
          (progn (setf (gethash "extra" args) number)
-                (raises-error-p (lambda () (image-agent/cli:dispatch-tool (list tool) "evaluate_form" args)))))))
+                (raises-error-p (lambda () (image-agent/cli:dispatch-tool (list tool) "develop_form" args)))))))
 (test generated-native-call-parsing
   (dotimes (i *pure-trials*) (exercise-property :native-calls (random 10000))))
 (defun valid-rollback-history-p (commands)
@@ -378,7 +387,7 @@
                         :on-tool (lambda (&rest args) (declare (ignore args)) (error "callback failed"))
                         :transport (lambda (&rest args) (declare (ignore args))
                                      (if (= 1 (incf step))
-                                         (native-sse (native-call "bad-result" "observe_world"))
+                                         (native-sse (native-call "bad-result" "inspect_world" "offset" 0))
                                          (native-sse (native-message "Handled the tool error.")))))))
             (is (equal "Handled the tool error." (image-agent/cli:chat-turn chat "inspect")))
             (let ((output (find "function_call_output" (image-agent/cli::chat-history chat)

@@ -1,0 +1,17 @@
+;; Generic fresh-process verification: application source/expectation arrive as arguments.
+(require :asdf)
+(push (truename "./") asdf:*central-registry*)
+(asdf:load-system "image-agent/store")
+(destructuring-bind (store source expected) (cdr sb-ext:*posix-argv*)
+  (let* ((world (image-agent:make-reference-world))
+         (session (image-agent:recover-session world store :interactive t))
+         (before (image-agent::current-revision store)))
+    (unwind-protect
+        (let* ((view (image-agent:session-step session))
+               (result (image-agent:session-step session (list :action :execute :source source :generation (getf view :generation))))
+               (value (getf (first (getf (getf result :outcome) :values)) :text)))
+          (unless (and (eq :idle (getf result :status)) (equal expected value)
+                       (equal before (image-agent::current-revision store)))
+            (error "Fresh execution failed or changed revision: ~s" result))
+          (format t "Fresh process execution PASS: ~a~%" value))
+      (image-agent:close-session session))))

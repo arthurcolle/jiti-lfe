@@ -28,7 +28,7 @@
     (unwind-protect
         (progn
           (is (eq :undefined-function (getf (getf (car report) :counterexample) :problem)))
-          (cli-action control :evaluate :source *unicode-correct-source*)
+          (cli-action control :develop :source *unicode-correct-source*)
           (is (getf (image-agent/cli:controller-view control) :goals-achieved))
           (is (= 1000 (getf (car report) :cases)))
           (dolist (shape '(:simple :adjustable :displaced))
@@ -43,7 +43,7 @@
     (multiple-value-bind (world session control report) (evolution-fixture :artifacts root)
       (unwind-protect
           (progn
-            (cli-action control :evaluate :source "(defun reverse-string (s) (reverse s))")
+            (cli-action control :develop :source "(defun reverse-string (s) (reverse s))")
             (is (eq :fail (getf (car report) :status)))
             (let* ((artifact (getf (car report) :artifact))
                    (record (image-agent::read-record artifact)))
@@ -52,14 +52,14 @@
               (is (<= (getf record :shrink-attempts) 100))
               (is (eq :reproduced (image-agent/experiments::replay artifact (make-broadcast-stream))))
               (is (every (lambda (s) (not (search "WORLD-" s))) (getf record :definitions))))
-            (cli-action control :evaluate :source "(defun reverse-string (s) (nreverse s))")
+            (cli-action control :develop :source "(defun reverse-string (s) (nreverse s))")
             (let ((sample (sample-on-worker world session control "abc")))
               (is (eq :input-mutated (getf sample :problem))))
-            (cli-action control :evaluate :source "(progn (defun reverse-string (s) (setf (gethash :x *state*) 99) (reverse s)))")
+            (cli-action control :develop :source "(progn (defun reverse-string (s) (setf (gethash :x *state*) 99) (reverse s)))")
             (let ((sample (sample-on-worker world session control "abc")))
               (is (getf sample :passed))
               (is (= 0 (gethash :x (image-agent:reference-table world)))))
-            (cli-action control :evaluate :source "(defun reverse-string (s) (declare (ignore s)) (error \"failed\"))")
+            (cli-action control :develop :source "(defun reverse-string (s) (declare (ignore s)) (error \"failed\"))")
             (is (eq :candidate-signaled (getf (sample-on-worker world session control "abc") :problem))))
         (image-agent:close-session session)))))
 (test evolution-prompts-repair-and-reject-false-success
@@ -72,10 +72,10 @@
                            (declare (ignore url key))
                            (push (image-agent/cli::parse-json body) requests)
                            (case (incf step)
-                             (1 (native-sse (native-call "bad" "evaluate_form" "source" "(defun reverse-string (s) (reverse s))"
+                             (1 (native-sse (native-call "bad" "develop_form" "source" "(defun reverse-string (s) (reverse s))"
                                             "generation" (getf (image-agent/cli:controller-view control) :generation))))
                              (2 (native-sse (native-message "Everything works.")))
-                             (3 (native-sse (native-call "good" "evaluate_form" "source" *unicode-correct-source*
+                             (3 (native-sse (native-call "good" "develop_form" "source" *unicode-correct-source*
                                             "generation" (getf (image-agent/cli:controller-view control) :generation))))
                              (4 (native-sse (native-message "Repaired.")))))))
                  (result (image-agent/experiments:evolve control chat image-agent/experiments::+goal+ :output (make-broadcast-stream))))
@@ -108,7 +108,7 @@
     (unwind-protect
         (let* ((chat (image-agent/cli:make-chat control :model "fake" :key "fake-key"
                        :transport (lambda (&rest args) (declare (ignore args))
-                                    (native-sse (native-call "one" "evaluate_form" "source" "(defun reverse-string (s) (reverse s))"
+                                    (native-sse (native-call "one" "develop_form" "source" "(defun reverse-string (s) (reverse s))"
                                           "generation" (getf (image-agent/cli:controller-view control) :generation))))))
                (result (image-agent/experiments:evolve control chat "Add reverse-string" :output (make-broadcast-stream))))
           (is (eq :failed (getf result :status)))
@@ -123,7 +123,7 @@
                        (image-agent/cli:make-chat control :model "fake" :key "fake-key"
                          :transport (lambda (&rest args) (declare (ignore args))
                                       (if (= 1 (incf step))
-                                          (native-sse (native-call "one" "evaluate_form" "source" *unicode-correct-source*
+                                          (native-sse (native-call "one" "develop_form" "source" *unicode-correct-source*
                                                         "generation" (getf (image-agent/cli:controller-view control) :generation)))
                                           (native-sse (native-message "Defined it.")))))))))
       (is (eq :success (getf result :status)))
@@ -136,7 +136,7 @@
     (declare (ignore world report))
     (unwind-protect
         (progn
-          (cli-action control :evaluate :source "(progn nil (setf image-agent/experiments::+goal+ \"bypass\"))")
+          (cli-action control :develop :source "(progn nil (setf image-agent/experiments::+goal+ \"bypass\"))")
           (is (eq :restored (getf (getf (image-agent/cli:controller-view control) :outcome) :commit)))
           (is (search "Add a new function" image-agent/experiments::+goal+)))
       (image-agent:close-session session)))
@@ -147,7 +147,7 @@
   (multiple-value-bind (world session control report) (evolution-fixture)
     (unwind-protect
         (progn
-          (cli-action control :evaluate :source "(defun reverse-string (s) (if (zerop (length s)) \"\" (with-output-to-string (out) (dolist (g (reverse (sb-unicode:graphemes s))) (write-string g out)))))")
+          (cli-action control :develop :source "(defun reverse-string (s) (if (zerop (length s)) \"\" (with-output-to-string (out) (dolist (g (reverse (sb-unicode:graphemes s))) (write-string g out)))))")
           (is (eq :result-reused (getf (getf (car report) :counterexample) :problem)))
           (is (not (getf (image-agent/cli:controller-view control) :goals-achieved)))
           (is (not (getf (sample-on-worker world session control "") :passed))))
@@ -158,13 +158,13 @@
     (multiple-value-bind (world session view) (fixture)
       (unwind-protect
           (progn
-            (setf view (send session view :action :evaluate :source source))
+            (setf view (send session view :action :develop :source source))
             (is (eq :paused (getf view :status)))
             (setf view (send session view :action :resume :restart-id (getf (first (getf view :restarts)) :id)
                                         :arguments "(list 1)"))
             (is (eq :idle (getf view :status)))
             (is (eq :restart-failed (getf (getf view :outcome) :reason)))
             (is (= 0 (gethash :x (image-agent:reference-table world))))
-            (setf view (send session view :action :evaluate :source "(setf (gethash :x *state*) 4)"))
+            (setf view (send session view :action :develop :source "(setf (gethash :x *state*) 4)"))
             (is (= 4 (gethash :x (image-agent:reference-table world)))))
         (image-agent:close-session session)))))

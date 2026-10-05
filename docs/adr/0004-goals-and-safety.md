@@ -17,6 +17,6 @@ Treating every failed application test as a safety violation would prevent usefu
 
 ## Consequences
 
-All goals must pass for success. Failed or signaled safety checks reject a candidate; signaled goals never imply completion. A nonempty goal contract is required.
+All goals must pass for success. Failed or signaled safety checks reject a candidate; signaled goals never imply completion. A nonempty goal contract is required for autonomous completion; interactive development may omit goals.
 
 Implementation: [src/properties.lisp](../../src/properties.lisp). Verification: [kernel suite](../../tests/suite.lisp).

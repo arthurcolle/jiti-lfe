@@ -7,6 +7,8 @@ with tempfile.TemporaryDirectory() as directory:
     shutil.copytree(root / 'docs', fixture / 'docs')
     shutil.copytree(root / 'src', fixture / 'src')
     shutil.copytree(root / 'tests', fixture / 'tests')
+    shutil.copytree(root / 'scripts', fixture / 'scripts')
+    shutil.copytree(root / 'launch', fixture / 'launch')
     def validate(success=True):
         r = subprocess.run(['python3', str(root/'scripts/check-adrs.py'), str(fixture)], capture_output=True, text=True)
         assert (r.returncode == 0) == success, r.stdout + r.stderr

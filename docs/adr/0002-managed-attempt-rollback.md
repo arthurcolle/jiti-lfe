@@ -17,6 +17,6 @@ Per-repair rollback through rebinding roots could leave live frames referencing 
 
 ## Consequences
 
-The caller must cover every allowed mutation. The reference adapter supports one readable data table and direct named DEFUNs, not arbitrary classes, methods, files, or external effects. Restore failures fault the session.
+The caller must cover every allowed mutation. The reference adapter supports one readable data table and direct named DEFUNs and literal local FMAKUNBOUND edits (see [0012](0012-managed-function-removal.md)), not arbitrary classes, methods, files, or external effects. Restore failures fault the session.
 
 Implementation: [src/reference-world.lisp](../../src/reference-world.lisp). Verification: [kernel suite](../../tests/suite.lisp).

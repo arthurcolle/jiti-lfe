@@ -1,0 +1,5 @@
+(require :asdf)
+(let ((*standard-output* *error-output*) (*trace-output* *error-output*))
+  (push (truename (merge-pathnames "../" (make-pathname :name nil :type nil :defaults *load-truename*))) asdf:*central-registry*)
+  (asdf:load-system "image-agent/terminal"))
+(image-agent/terminal:main (rest sb-ext:*posix-argv*))

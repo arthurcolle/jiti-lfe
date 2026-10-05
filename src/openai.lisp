@@ -6,21 +6,29 @@
   (with-output-to-string (s) (yason:encode object s)))
 (defun parse-action (text)
   (unless (and (stringp text) (<= (length text) 16384)) (error 'policy-error))
-  (let* ((object (with-input-from-string (input text)
+  (let* ((object (let ((yason:*parse-json-booleans-as-symbols* t)) (with-input-from-string (input text)
                     (let ((value (yason:parse input)))
                       (loop for c = (read-char input nil nil) while c
                             unless (find c '(#\Space #\Tab #\Newline #\Return))
                               do (error 'policy-error))
-                      value))) (action (and (hash-table-p object) (gethash "action" object)))
-         (allowed (cond ((equal action "evaluate") '("action" "source"))
+                      value)))) (action (and (hash-table-p object) (gethash "action" object)))
+         (allowed (cond ((equal action "develop") '("action" "source"))
+                        ((equal action "execute") '("action" "source" "preview"))
                         ((equal action "resume") '("action" "restart_id" "arguments"))
                         ((equal action "abort") '("action")))))
     (unless allowed (error 'policy-error))
     (maphash (lambda (key value) (declare (ignore value))
                (unless (member key allowed :test #'equal) (error 'policy-error))) object)
-    (cond ((equal action "evaluate")
+    (cond ((equal action "develop")
            (unless (stringp (gethash "source" object)) (error 'policy-error))
-           (list :action :evaluate :source (gethash "source" object)))
+           (list :action :develop :source (gethash "source" object)))
+          ((equal action "execute")
+           (unless (and (stringp (gethash "source" object))
+                        (nth-value 1 (gethash "preview" object))
+                        (member (gethash "preview" object) '(yason:true yason:false)))
+             (error 'policy-error))
+           (list :action :execute :source (gethash "source" object)
+                 :preview (not (null (member (gethash "preview" object) '(yason:true))))))
           ((equal action "resume")
            (unless (and (stringp (gethash "restart_id" object))
                         (stringp (gethash "arguments" object))) (error 'policy-error))
@@ -77,18 +85,46 @@
           (when (>= (length bytes) 1048576) (error 'policy-error))
           (vector-push-extend byte bytes))
         (babel:octets-to-string bytes :encoding :utf-8))))
-(defun default-transport (url key body)
-  (handler-case
-      (sb-ext:with-timeout 60
-        (multiple-value-bind (stream status)
-          (dexador:post url :headers (list (cons "Authorization" (concatenate 'string "Bearer " key))
-                                          (cons "Content-Type" "application/json"))
-                           :content body :want-stream t :connect-timeout 10 :read-timeout 30)
-        (unwind-protect
-             (progn (unless (= status 200) (error 'policy-error))
-                    (read-response-stream stream))
-          (close stream))))
+(define-condition responses-error (configuration-error)
+  ((kind :initarg :kind :reader responses-error-kind))
+  (:default-initargs :message "Responses request failed; credentials and response body suppressed"))
+(defun response-error-kind (status body)
+  "Keep only a fixed classification, never provider text, headers, or credentials."
+  (let ((code (ignore-errors
+                (when (and (stringp body) (<= (length body) 65536))
+                  (let ((value (yason:parse body)))
+                    (gethash "code" (gethash "error" value)))))))
+    (cond ((and (= status 400) (equal code "context_length_exceeded")) :context-overflow)
+          ((or (member status '(404 405 501))
+               (and (= status 400) (member code '("unsupported_model" "model_not_supported"
+                  "unsupported_endpoint" "not_supported") :test #'equal))) :unsupported)
+          (t :failed))))
+(defun guarded-transport (request)
+  (handler-case (funcall request)
+    (responses-error (c) (error c))
+    (sb-ext:timeout () (error 'configuration-error :message "Responses transport timed out; credentials and response body suppressed"))
     (error () (error 'configuration-error :message "Responses transport failed; credentials and response body suppressed"))))
+(defun default-transport (url key body)
+  (guarded-transport
+    (lambda ()
+      (sb-ext:with-timeout 60
+        (handler-case
+          (multiple-value-bind (stream status)
+            (dexador:post url :headers (list (cons "Authorization" (concatenate 'string "Bearer " key))
+                                            (cons "Content-Type" "application/json"))
+                             :content body :want-stream t :connect-timeout 10 :read-timeout 30)
+          (unwind-protect
+               (progn (unless (= status 200) (error 'policy-error))
+                      (read-response-stream stream))
+            (close stream)))
+          (dexador.error:http-request-failed (c)
+            (let ((response-body (dexador.error:response-body c)))
+              (unwind-protect
+                   (error 'responses-error :kind
+                          (response-error-kind (dexador.error:response-status c)
+                            (if (streamp response-body)
+                                (ignore-errors (read-response-stream response-body)) response-body)))
+                (when (streamp response-body) (ignore-errors (close response-body)))))))))))
 (defun make-openai-proposer (&key (transport #'default-transport)
                                  (model (environment "OPENAI_MODEL"))
                                  (base-url (or (environment "OPENAI_BASE_URL") "https://api.openai.com/v1"))
@@ -100,7 +136,7 @@
                  (json-object "model" model "stream" t
                    "input" (vector (json-object "role" "user" "content"
                      (vector (json-object "type" "input_text" "text"
-                       (format nil "You operate a live Common Lisp image. Return ONLY one JSON object: {\"action\":\"evaluate\",\"source\":\"one Lisp form\"}, {\"action\":\"resume\",\"restart_id\":\"published ID\",\"arguments\":\"Lisp expression returning a list\"}, or {\"action\":\"abort\"}. Observe before editing. Do not refer to IMAGE-AGENT symbols. World context: ~a" (bounded observation 12000))))))))))
+                       (format nil "You operate a live Common Lisp image. Return ONLY one JSON object: {\"action\":\"develop\",\"source\":\"one Lisp form\"}, {\"action\":\"execute\",\"source\":\"one Lisp expression\",\"preview\":false}, {\"action\":\"resume\",\"restart_id\":\"published ID\",\"arguments\":\"Lisp expression returning a list\"}, or {\"action\":\"abort\"}. Observe before editing. Do not refer to IMAGE-AGENT symbols. World context: ~a" (bounded observation 12000))))))))))
       (append (parse-sse (funcall transport
                          (concatenate 'string (string-right-trim "/" base-url) "/responses") key body))
               (list :model model)))))

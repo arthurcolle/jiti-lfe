@@ -1,0 +1,1247 @@
+{
+  "schema_version": 1,
+  "project": "jiti",
+  "title": "An application you grow by talking to it",
+  "fps": 24,
+  "default_resolution": {
+    "landscape": [
+      1920,
+      1080
+    ],
+    "portrait": [
+      1080,
+      1920
+    ]
+  },
+  "provenance_policy": "Show capture provenance in every evidence scene. Scripted deterministic kernel evidence must never be labeled as model-generated chat. Illustrations are explanatory diagrams. Never invent model replies.",
+  "videos": [
+    {
+      "id": "01-grow-an-app",
+      "title": "Grow an app by talking to it",
+      "duration": 90,
+      "orientations": [
+        "landscape"
+      ],
+      "kind": "launch",
+      "scenes": [
+        {
+          "id": "empty",
+          "title": "Start with an empty application catalogue",
+          "duration": 10,
+          "narration": "This is Jiti: a running Lisp application you can grow through conversation. Our expense ledger begins empty. There are no expense functions yet.",
+          "visual": {
+            "kind": "capture",
+            "description": "Start with an empty application catalogue",
+            "headline": "Start with an empty application catalogue",
+            "lines": [
+              "A running Lisp kernel",
+              "An empty managed ledger",
+              "No expense functions"
+            ],
+            "caption": "The runtime and caller checks already exist."
+          },
+          "evidence_ids": [
+            "empty_catalogue"
+          ]
+        },
+        {
+          "id": "first",
+          "title": "Teach it to record an expense",
+          "duration": 12,
+          "narration": "Ask it to record expenses. The controller adds a real Lisp function. Call it with four hundred fifty cents and the coffee category. The ledger now contains that entry.",
+          "visual": {
+            "kind": "capture",
+            "description": "Teach it to record an expense",
+            "headline": "Teach it to record an expense",
+            "lines": [
+              "“Let me record an expense.”",
+              "(add-expense 450 :coffee)",
+              "Amounts use integer cents"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "define_expense",
+            "record_expense"
+          ]
+        },
+        {
+          "id": "total",
+          "title": "Add the next useful capability",
+          "duration": 13,
+          "narration": "Next, ask for total spending. Add groceries and transport, then call the new function. Four fifty, thirty-two dollars, and eighteen dollars become fifty-four dollars and fifty cents.",
+          "visual": {
+            "kind": "capture",
+            "description": "Add the next useful capability",
+            "headline": "Add the next useful capability",
+            "lines": [
+              "Coffee $4.50",
+              "Groceries $32.00 · Transport $18.00",
+              "Total $54.50"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "spending_total"
+          ]
+        },
+        {
+          "id": "compose",
+          "title": "Reuse what the application has learned",
+          "duration": 12,
+          "narration": "Ask for spending by category, then a budget report. That report calls the functions already in the image. With a sixty dollar budget, five dollars and fifty cents remain.",
+          "visual": {
+            "kind": "capture",
+            "description": "Reuse what the application has learned",
+            "headline": "Reuse what the application has learned",
+            "lines": [
+              "Category totals",
+              "Budget $60.00",
+              "Spent $54.50 · Remaining $5.50"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "category_totals",
+            "budget_report"
+          ]
+        },
+        {
+          "id": "preview",
+          "title": "Try a change, then undo an accepted change",
+          "duration": 15,
+          "narration": "Preview an extra expense and inspect its result. The managed ledger is restored afterward. Accept a change instead, and it becomes a revision. Rollback restores earlier code and data while preserving history.",
+          "visual": {
+            "kind": "capture",
+            "description": "Try a change, then undo an accepted change",
+            "headline": "Try a change, then undo an accepted change",
+            "lines": [
+              "Preview → inspect → restore",
+              "Accept → publish revision",
+              "Rollback → new revision"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "preview_restore",
+            "rollback_history"
+          ]
+        },
+        {
+          "id": "repair",
+          "title": "Repair a call while it is paused",
+          "duration": 15,
+          "narration": "A report pauses on an unsupported category. Repair its helper and resume through the live restart. The original call keeps its existing frame. A later invocation uses the new report definition.",
+          "visual": {
+            "kind": "capture",
+            "description": "Repair a call while it is paused",
+            "headline": "Repair a call while it is paused",
+            "lines": [
+              "Same operation",
+              "Original frame resumes",
+              "Next call uses new definition"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "paused_call",
+            "repair_resume",
+            "subsequent_call"
+          ]
+        },
+        {
+          "id": "recover",
+          "title": "Reopen it. Keep the application you built.",
+          "duration": 13,
+          "narration": "Restart the process. Accepted functions and ledger data recover together. Jiti combines conversation with Lisp development, live repair, and managed history. Inspect the source, run the demo, and build the next capability.",
+          "visual": {
+            "kind": "capture",
+            "description": "Reopen it. Keep the application you built.",
+            "headline": "Reopen it. Keep the application you built.",
+            "lines": [
+              "Accepted code + managed data recover",
+              "Active stacks stay in the live process",
+              "Run Jiti · inspect the source"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "fresh_recovery"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "02-what-happens",
+      "title": "What actually happens when you ask?",
+      "duration": 120,
+      "orientations": [
+        "landscape"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "request",
+          "title": "A request becomes a concrete operation",
+          "duration": 15,
+          "narration": "You type: let me record an expense with an amount and category. The model sees the application catalogue and the tools available to it. A request can become development, execution, or inspection.",
+          "visual": {
+            "kind": "diagram",
+            "description": "A request becomes a concrete operation",
+            "headline": "A request becomes a concrete operation",
+            "lines": [
+              "Your request",
+              "Controller + registered tools",
+              "Owning worker",
+              "Application"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "contract",
+          "title": "The application starts with a small contract",
+          "duration": 15,
+          "narration": "Our example starts with a ledger and caller-owned checks. Amounts are integer cents. Categories describe each entry. Expense functions are absent, so the first request really adds a capability to this application.",
+          "visual": {
+            "kind": "capture",
+            "description": "The application starts with a small contract",
+            "headline": "The application starts with a small contract",
+            "lines": [
+              "Empty ledger",
+              "Integer cents",
+              "Caller-owned checks",
+              "No expense functions"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "empty_catalogue"
+          ]
+        },
+        {
+          "id": "definition",
+          "title": "A definition becomes a reusable function",
+          "duration": 15,
+          "narration": "The controller submits a Lisp definition through the development tool. The worker evaluates it inside the application. Once accepted, the function appears in the catalogue, with its arguments, documentation, and source available for inspection.",
+          "visual": {
+            "kind": "capture",
+            "description": "A definition becomes a reusable function",
+            "headline": "A definition becomes a reusable function",
+            "lines": [
+              "Develop a definition",
+              "Check the result",
+              "Publish accepted changes",
+              "Inspect function source"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "define_expense"
+          ]
+        },
+        {
+          "id": "execute",
+          "title": "Calling the function changes managed state",
+          "duration": 15,
+          "narration": "Now call add-expense with four hundred fifty cents and coffee. The worker updates the managed ledger. This is an execution of a real function. Its accepted state can be stored and recovered later.",
+          "visual": {
+            "kind": "capture",
+            "description": "Calling the function changes managed state",
+            "headline": "Calling the function changes managed state",
+            "lines": [
+              "(add-expense 450 :coffee)",
+              "Ledger: coffee, 450 cents",
+              "Accepted data change → revision"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "record_expense"
+          ]
+        },
+        {
+          "id": "query",
+          "title": "Read the accumulated application state",
+          "duration": 15,
+          "narration": "Add groceries and transport, then ask for a total. The new total-expenses function reads the same ledger. The result is five thousand four hundred fifty cents: fifty-four dollars and fifty cents.",
+          "visual": {
+            "kind": "capture",
+            "description": "Read the accumulated application state",
+            "headline": "Read the accumulated application state",
+            "lines": [
+              "450 + 3200 + 1800",
+              "5450 cents",
+              "Pure reads need no new revision"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "spending_total"
+          ]
+        },
+        {
+          "id": "reuse",
+          "title": "Compose ordinary Lisp functions",
+          "duration": 15,
+          "narration": "A budget report can call total-expenses and spending-by-category. It does not need another special pipeline language. The application grows a vocabulary of useful functions that you, or the conversational controller, can reuse.",
+          "visual": {
+            "kind": "diagram",
+            "description": "Compose ordinary Lisp functions",
+            "headline": "Compose ordinary Lisp functions",
+            "lines": [
+              "budget-report",
+              "total-expenses",
+              "spending-by-category",
+              "Existing ledger"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "budget_report"
+          ]
+        },
+        {
+          "id": "inspect",
+          "title": "Make the machinery inspectable",
+          "duration": 15,
+          "narration": "Inspect the catalogue, read a function, and review operation history. Operations record attempts; revisions identify accepted code or data changes. An unsuccessful attempt can be useful evidence without becoming a new application version.",
+          "visual": {
+            "kind": "diagram",
+            "description": "Make the machinery inspectable",
+            "headline": "Make the machinery inspectable",
+            "lines": [
+              "/functions · /describe",
+              "/operations: attempts",
+              "/history: accepted revisions"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "retain",
+          "title": "Keep accepted work across sessions",
+          "duration": 15,
+          "narration": "Closing the process ends its active calls. Reopening the same workspace recovers accepted managed code and data. Conversation memory has its own lifetime. The useful artifact you have built is the evolving Lisp application.",
+          "visual": {
+            "kind": "capture",
+            "description": "Keep accepted work across sessions",
+            "headline": "Keep accepted work across sessions",
+            "lines": [
+              "Same workspace",
+              "Recovered definitions",
+              "Recovered ledger",
+              "New process and call stacks"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "fresh_recovery"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "03-inside-the-image",
+      "title": "Inside the running Lisp image",
+      "duration": 240,
+      "orientations": [
+        "landscape"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "overview",
+          "title": "A controller outside, a worker inside",
+          "duration": 20,
+          "narration": "Jiti is a cooperative live image repair kernel for SBCL. An external controller proposes actions. One owning worker evaluates application forms and retains live restarts when a condition pauses an attempt. This separation lets the controller inspect and repair a call without moving its restart to another thread.",
+          "visual": {
+            "kind": "diagram",
+            "description": "A controller outside, a worker inside",
+            "headline": "A controller outside, a worker inside",
+            "lines": [
+              "External controller",
+              "Registered action protocol",
+              "Owning SBCL worker",
+              "Managed application world"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "adapter",
+          "title": "The world adapter defines what is managed",
+          "duration": 20,
+          "narration": "An application supplies a world adapter: an evaluation package, observations, checkpoints, restoration, and a catalogue. Durable export and import make managed state recoverable. The reference adapter covers readable table values and supported named function definitions. An application with other resources needs corresponding adapter coverage.",
+          "visual": {
+            "kind": "diagram",
+            "description": "The world adapter defines what is managed",
+            "headline": "The world adapter defines what is managed",
+            "lines": [
+              "Evaluation + observation",
+              "Checkpoint + restore",
+              "Function catalogue",
+              "Durable export + import"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "start",
+          "title": "A small foundation, then incremental definitions",
+          "duration": 20,
+          "narration": "The expense example starts with an empty ledger and executable caller checks. It has no expense functions. Development adds add-expense, total-expenses, spending-by-category, and budget-report in stages. The source is inspectable, and each accepted definition becomes available to later calls.",
+          "visual": {
+            "kind": "capture",
+            "description": "A small foundation, then incremental definitions",
+            "headline": "A small foundation, then incremental definitions",
+            "lines": [
+              "Empty catalogue",
+              "add-expense → total-expenses",
+              "spending-by-category → budget-report",
+              "Source remains inspectable"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "empty_catalogue",
+            "budget_report"
+          ]
+        },
+        {
+          "id": "acceptance",
+          "title": "Goals and safety answer different questions",
+          "duration": 20,
+          "narration": "A goal asks whether we have reached the desired behavior. A safety invariant asks whether an intermediate state is acceptable. A false goal can coexist with an accepted development step. A false or signaled invariant rejects the attempt and restores its managed checkpoint. The caller owns both contracts.",
+          "visual": {
+            "kind": "diagram",
+            "description": "Goals and safety answer different questions",
+            "headline": "Goals and safety answer different questions",
+            "lines": [
+              "Goal: does the report work?",
+              "Safety: is the ledger valid?",
+              "False goal → may keep safe progress",
+              "Failed safety check → restore"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "caller_checks",
+            "safety_rejection"
+          ]
+        },
+        {
+          "id": "transaction",
+          "title": "One provisional checkpoint covers the attempt",
+          "duration": 20,
+          "narration": "The worker checkpoints managed state before reading, compiling, and evaluating a form. Repairs performed while that attempt is paused share its provisional checkpoint. If repair evaluation fails, the entire attempt is aborted. This makes code changes and data changes participate in the same managed rollback boundary.",
+          "visual": {
+            "kind": "diagram",
+            "description": "One provisional checkpoint covers the attempt",
+            "headline": "One provisional checkpoint covers the attempt",
+            "lines": [
+              "Checkpoint",
+              "Evaluate → pause → repair",
+              "Check accepted result",
+              "Commit or restore"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "history",
+          "title": "Operations, revisions, and generations differ",
+          "duration": 20,
+          "narration": "Each attempt has an operation identity for diagnostics. A revision identifies accepted managed code or data. Pure calls and final-state no-ops do not create revisions. Observation generations coordinate worker actions and reject stale commands. These identifiers serve different purposes, even when one interaction displays all three.",
+          "visual": {
+            "kind": "diagram",
+            "description": "Operations, revisions, and generations differ",
+            "headline": "Operations, revisions, and generations differ",
+            "lines": [
+              "Operation: one attempt",
+              "Revision: accepted managed state",
+              "Generation: coordination guard",
+              "Pure result ≠ new revision"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "preview",
+          "title": "Preview restores managed code and data",
+          "duration": 20,
+          "narration": "Preview evaluates an operation and returns bounded printable results, then restores the checkpoint. Its restoration also covers repairs made during a pause. Ordinary execution can retain safe changes instead. Preview only covers managed effects; an adapter cannot retract an email or network request simply by restoring its ledger.",
+          "visual": {
+            "kind": "capture",
+            "description": "Preview restores managed code and data",
+            "headline": "Preview restores managed code and data",
+            "lines": [
+              "Preview an added expense",
+              "Observe temporary result",
+              "Restore managed state",
+              "External effects need separate handling"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "preview_restore"
+          ]
+        },
+        {
+          "id": "rollback",
+          "title": "Rollback publishes a new point in history",
+          "duration": 20,
+          "narration": "After a change is accepted, rollback can restore an older managed revision. It publishes a new revision rather than erasing the intervening history. This is different from preview, which does not retain the temporary change. Rollback restores application code and data, not a historical call stack.",
+          "visual": {
+            "kind": "capture",
+            "description": "Rollback publishes a new point in history",
+            "headline": "Rollback publishes a new point in history",
+            "lines": [
+              "Accepted revision A",
+              "Accepted revision B",
+              "Rollback creates revision C",
+              "C restores A; history remains"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "rollback_history"
+          ]
+        },
+        {
+          "id": "pause",
+          "title": "A condition exposes live restart choices",
+          "duration": 20,
+          "narration": "Here a report encounters a category its label helper cannot handle. The worker pauses inside the active call and exposes restart choices. The operation identity remains the same. Its local marker and entry counter give us concrete evidence about which frame continues when we repair and resume.",
+          "visual": {
+            "kind": "capture",
+            "description": "A condition exposes live restart choices",
+            "headline": "A condition exposes live restart choices",
+            "lines": [
+              "Unsupported :transport category",
+              "Live restart choices",
+              "Original marker: v1-active-frame",
+              "Report entry count: 1"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "paused_call"
+          ]
+        },
+        {
+          "id": "resume",
+          "title": "Resume the original frame after repairing a helper",
+          "duration": 20,
+          "narration": "We replace the category helper and also define a new report body. Resuming through the live restart completes the existing invocation with its original frame marker. A subsequent report call enters the new body and increments the counter again. Global dispatch can see new helpers; existing frames retain their bodies.",
+          "visual": {
+            "kind": "capture",
+            "description": "Resume the original frame after repairing a helper",
+            "headline": "Resume the original frame after repairing a helper",
+            "lines": [
+              "Repair helper and report definition",
+              "Resume → v1-active-frame, count 1",
+              "Next call → v2-new-frame, count 2"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "repair_resume",
+            "subsequent_call"
+          ]
+        },
+        {
+          "id": "recovery",
+          "title": "Durable recovery starts a fresh process",
+          "duration": 20,
+          "narration": "Persistence records immutable world artifacts and a current revision pointer. Recovery imports the accepted revision into a fresh process. It does not replay old actions or recreate suspended stacks. Unfinished operations become interrupted diagnostics. The recovered expense functions still read the recovered ledger and produce the same totals.",
+          "visual": {
+            "kind": "capture",
+            "description": "Durable recovery starts a fresh process",
+            "headline": "Durable recovery starts a fresh process",
+            "lines": [
+              "Immutable accepted artifacts",
+              "New SBCL process",
+              "Import definitions + ledger",
+              "No replay of old operations"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "fresh_recovery"
+          ]
+        },
+        {
+          "id": "limits",
+          "title": "An inspectable experiment in live development",
+          "duration": 20,
+          "narration": "The kernel relies on cooperative application code and accurate world adapters. Arbitrary hostile Lisp and unmanaged resources are beyond its guarantees. What the demo makes concrete is incremental development with caller-owned checks, accepted history, and a live repair path. Run it, inspect its evidence, and adapt the world to your application.",
+          "visual": {
+            "kind": "diagram",
+            "description": "An inspectable experiment in live development",
+            "headline": "An inspectable experiment in live development",
+            "lines": [
+              "Cooperative SBCL application",
+              "Complete adapter coverage matters",
+              "Inspect code, operations, and checks",
+              "Try the reproducible demo"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        }
+      ]
+    },
+    {
+      "id": "04-first-function",
+      "title": "Your first function",
+      "duration": 30,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "empty",
+          "title": "No expense functions yet",
+          "duration": 10,
+          "narration": "This application starts with an empty managed ledger. Inspect its catalogue: there are no expense functions yet. Now ask for the first one.",
+          "visual": {
+            "kind": "capture",
+            "description": "No expense functions yet",
+            "headline": "No expense functions yet",
+            "lines": [
+              "Empty ledger",
+              "Empty expense catalogue",
+              "“Let me record an expense.”"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "empty_catalogue"
+          ]
+        },
+        {
+          "id": "define",
+          "title": "A request adds a real Lisp function",
+          "duration": 10,
+          "narration": "The development tool adds add-expense. Its amount is measured in integer cents, and its second argument names the category. Inspect the definition.",
+          "visual": {
+            "kind": "capture",
+            "description": "A request adds a real Lisp function",
+            "headline": "A request adds a real Lisp function",
+            "lines": [
+              "add-expense(amount, category)",
+              "Real Lisp definition",
+              "Source available in the catalogue"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "define_expense"
+          ]
+        },
+        {
+          "id": "use",
+          "title": "Use it immediately",
+          "duration": 10,
+          "narration": "Call it with four hundred fifty cents and coffee. The ledger changes. You have added the first reusable capability to a running application.",
+          "visual": {
+            "kind": "capture",
+            "description": "Use it immediately",
+            "headline": "Use it immediately",
+            "lines": [
+              "(add-expense 450 :coffee)",
+              "Coffee: $4.50",
+              "Ask for the next capability"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "record_expense"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "05-teach-once",
+      "title": "Teach once, combine later",
+      "duration": 40,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "pieces",
+          "title": "Start with functions you already have",
+          "duration": 10,
+          "narration": "Our ledger already has three expenses. We have functions to record them, total them, and group spending by category.",
+          "visual": {
+            "kind": "capture",
+            "description": "Start with functions you already have",
+            "headline": "Start with functions you already have",
+            "lines": [
+              "Coffee $4.50",
+              "Groceries $32.00",
+              "Transport $18.00"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "spending_total",
+            "category_totals"
+          ]
+        },
+        {
+          "id": "request",
+          "title": "Ask for a budget report",
+          "duration": 10,
+          "narration": "Now ask for a sixty dollar budget report. The useful move is to compose the functions the application already knows.",
+          "visual": {
+            "kind": "diagram",
+            "description": "Ask for a budget report",
+            "headline": "Ask for a budget report",
+            "lines": [
+              "“Combine those into a budget report.”",
+              "total-expenses",
+              "spending-by-category"
+            ],
+            "caption": "Explanatory diagram"
+          },
+          "evidence_ids": []
+        },
+        {
+          "id": "composition",
+          "title": "Ordinary function calls do the work",
+          "duration": 10,
+          "narration": "Budget-report calls those existing functions and calculates the remainder. This composition becomes another named function you can inspect and call again.",
+          "visual": {
+            "kind": "capture",
+            "description": "Ordinary function calls do the work",
+            "headline": "Ordinary function calls do the work",
+            "lines": [
+              "budget-report(6000)",
+              "Calls total-expenses",
+              "Calls spending-by-category"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "define_report",
+            "budget_report"
+          ]
+        },
+        {
+          "id": "result",
+          "title": "The application gains a vocabulary",
+          "duration": 10,
+          "narration": "Fifty-four dollars and fifty cents spent. Five dollars and fifty cents left. Each new function becomes a building block for the next request.",
+          "visual": {
+            "kind": "capture",
+            "description": "The application gains a vocabulary",
+            "headline": "The application gains a vocabulary",
+            "lines": [
+              "Budget $60.00",
+              "Spent $54.50",
+              "Remaining $5.50"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "budget_report"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "06-reopen",
+      "title": "Close it. Your app remains.",
+      "duration": 35,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "before",
+          "title": "Save accepted application state",
+          "duration": 10,
+          "narration": "We have accepted expense functions and a ledger containing fifty-four dollars and fifty cents of spending. Those definitions and data share a workspace.",
+          "visual": {
+            "kind": "capture",
+            "description": "Save accepted application state",
+            "headline": "Save accepted application state",
+            "lines": [
+              "Accepted function definitions",
+              "Accepted expense ledger",
+              "Persistent workspace"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "budget_report"
+          ]
+        },
+        {
+          "id": "restart",
+          "title": "Start a fresh SBCL process",
+          "duration": 12,
+          "narration": "Close the process, then reopen the same workspace. Recovery imports the accepted revision. It does not replay past actions or bring old call stacks back to life.",
+          "visual": {
+            "kind": "capture",
+            "description": "Start a fresh SBCL process",
+            "headline": "Start a fresh SBCL process",
+            "lines": [
+              "Process ends",
+              "Fresh SBCL process starts",
+              "Accepted revision imported"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "fresh_recovery"
+          ]
+        },
+        {
+          "id": "after",
+          "title": "Call the recovered application",
+          "duration": 13,
+          "narration": "Call the recovered report with the same sixty dollar budget. Five dollars and fifty cents remain. The durable result of the conversation is application code and data you can use again.",
+          "visual": {
+            "kind": "capture",
+            "description": "Call the recovered application",
+            "headline": "Call the recovered application",
+            "lines": [
+              "Recovered budget-report",
+              "Recovered ledger",
+              "Same $5.50 remaining"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "fresh_recovery"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "07-preview-rollback",
+      "title": "Try a change. Undo a change.",
+      "duration": 45,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "preview",
+          "title": "Preview a temporary change",
+          "duration": 12,
+          "narration": "Preview adding another expense. You can inspect the temporary result, then the managed ledger returns to its earlier state. The trial does not become an accepted revision.",
+          "visual": {
+            "kind": "capture",
+            "description": "Preview a temporary change",
+            "headline": "Preview a temporary change",
+            "lines": [
+              "Preview an extra expense",
+              "Inspect its temporary result",
+              "Original ledger restored"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "preview_restore"
+          ]
+        },
+        {
+          "id": "accept",
+          "title": "Accept a change into history",
+          "duration": 16,
+          "narration": "Execute a change normally and let caller checks validate it. Safe managed changes can become an accepted revision. Operation history records the attempt; revision history records the new application state. These histories tell different parts of the story.",
+          "visual": {
+            "kind": "capture",
+            "description": "Accept a change into history",
+            "headline": "Accept a change into history",
+            "lines": [
+              "Execute change",
+              "Check managed state",
+              "Publish accepted revision",
+              "Inspect /operations and /history"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "accepted_change"
+          ]
+        },
+        {
+          "id": "rollback",
+          "title": "Restore earlier state and preserve history",
+          "duration": 17,
+          "narration": "Now roll back to the earlier revision. Jiti restores its managed definitions and data and publishes another revision. The intervening history remains inspectable. Preview is for trying a change; rollback is for restoring an already accepted state.",
+          "visual": {
+            "kind": "capture",
+            "description": "Restore earlier state and preserve history",
+            "headline": "Restore earlier state and preserve history",
+            "lines": [
+              "Earlier accepted state",
+              "Rollback → new revision",
+              "Code and data restored",
+              "History preserved"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "rollback_history"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "08-paused-repair",
+      "title": "Repair the paused call",
+      "duration": 60,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "call",
+          "title": "One report call enters the worker",
+          "duration": 12,
+          "narration": "A report starts with the local marker v-one active frame. Its entry counter is one. It then encounters a transport category its helper cannot label.",
+          "visual": {
+            "kind": "capture",
+            "description": "One report call enters the worker",
+            "headline": "One report call enters the worker",
+            "lines": [
+              "Marker: v1-active-frame",
+              "Entry count: 1",
+              "Unsupported :transport"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "paused_call"
+          ]
+        },
+        {
+          "id": "pause",
+          "title": "The worker holds the active restart",
+          "duration": 12,
+          "narration": "The condition pauses the attempt and exposes a live restart. The owning worker keeps that restart in its dynamic extent while the controller inspects the problem.",
+          "visual": {
+            "kind": "capture",
+            "description": "The worker holds the active restart",
+            "headline": "The worker holds the active restart",
+            "lines": [
+              "Same worker",
+              "Same operation",
+              "Live restart remains available"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "paused_call"
+          ]
+        },
+        {
+          "id": "patch",
+          "title": "Repair the helper and replace the report body",
+          "duration": 12,
+          "narration": "Repair the category-label helper. Also define a new report body with a different marker. Those changes are provisional parts of the paused attempt until it completes safely.",
+          "visual": {
+            "kind": "capture",
+            "description": "Repair the helper and replace the report body",
+            "headline": "Repair the helper and replace the report body",
+            "lines": [
+              "category-label supports transport",
+              "New report marker: v2-new-frame",
+              "Shared provisional checkpoint"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "repair_definitions"
+          ]
+        },
+        {
+          "id": "resume",
+          "title": "The original call continues",
+          "duration": 12,
+          "narration": "Resume through the live restart. The report completes with v-one active frame and an entry count of one. That result proves the original invocation continued.",
+          "visual": {
+            "kind": "capture",
+            "description": "The original call continues",
+            "headline": "The original call continues",
+            "lines": [
+              "Original operation resumes",
+              "Result: v1-active-frame",
+              "Entry count still 1"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "repair_resume"
+          ]
+        },
+        {
+          "id": "next",
+          "title": "The next call uses the new definition",
+          "duration": 12,
+          "narration": "Call the report again. Now it returns v-two new frame and the entry count reaches two. New calls use the replacement; existing frames keep their original bodies.",
+          "visual": {
+            "kind": "capture",
+            "description": "The next call uses the new definition",
+            "headline": "The next call uses the new definition",
+            "lines": [
+              "New report invocation",
+              "Result: v2-new-frame",
+              "Entry count now 2"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "subsequent_call"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "09-caller-checks",
+      "title": "Who decides whether it works?",
+      "duration": 45,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "explainer",
+      "scenes": [
+        {
+          "id": "goals",
+          "title": "The caller defines success",
+          "duration": 15,
+          "narration": "The caller supplies executable goals. For this ledger, the known expenses must total fifty-four dollars and fifty cents, and the sixty dollar report must leave five dollars and fifty cents. Model-written tests cannot replace that contract.",
+          "visual": {
+            "kind": "capture",
+            "description": "The caller defines success",
+            "headline": "The caller defines success",
+            "lines": [
+              "Known data → $54.50 spent",
+              "Budget $60.00 → $5.50 remains",
+              "Caller-owned acceptance contract"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "caller_checks"
+          ]
+        },
+        {
+          "id": "safety",
+          "title": "Safety checks protect intermediate state",
+          "duration": 15,
+          "narration": "Safety invariants answer another question: is the managed ledger still valid? A bad amount or malformed entry must fail the caller check. When safety fails, the attempt is rejected and managed changes are restored.",
+          "visual": {
+            "kind": "capture",
+            "description": "Safety checks protect intermediate state",
+            "headline": "Safety checks protect intermediate state",
+            "lines": [
+              "Validate ledger entries",
+              "Reject invalid managed state",
+              "Restore the attempt checkpoint"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "safety_rejection"
+          ]
+        },
+        {
+          "id": "progress",
+          "title": "Safe progress can precede a finished feature",
+          "duration": 15,
+          "narration": "A missing report can leave the goal false while a useful new helper is accepted. That allows incremental development. Goal predicates track completion; safety checks constrain every accepted step toward it. Inspect both in the demo evidence.",
+          "visual": {
+            "kind": "diagram",
+            "description": "Safe progress can precede a finished feature",
+            "headline": "Safe progress can precede a finished feature",
+            "lines": [
+              "Goal false + safety passes",
+              "Useful intermediate revision",
+              "Goal passes → requested behavior"
+            ],
+            "caption": "Recorded kernel execution; see provenance label."
+          },
+          "evidence_ids": [
+            "define_expense"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "10-say-the-word",
+      "title": "Say the Word",
+      "duration": 30,
+      "orientations": [
+        "landscape",
+        "portrait"
+      ],
+      "kind": "music-trailer",
+      "scenes": [
+        {
+          "id": "word",
+          "title": "Say the word",
+          "duration": 5,
+          "narration": "",
+          "visual": {
+            "kind": "capture",
+            "description": "Say the word",
+            "headline": "Say the word",
+            "lines": [
+              "“Let me record an expense.”",
+              "A new function appears"
+            ],
+            "caption": "Original theme: Say the Word"
+          },
+          "evidence_ids": [
+            "record_expense"
+          ]
+        },
+        {
+          "id": "grow",
+          "title": "Watch it grow",
+          "duration": 5,
+          "narration": "",
+          "visual": {
+            "kind": "capture",
+            "description": "Watch it grow",
+            "headline": "Watch it grow",
+            "lines": [
+              "Coffee · Groceries · Transport",
+              "The ledger becomes useful"
+            ],
+            "caption": "Piece by piece, see where it goes"
+          },
+          "evidence_ids": [
+            "spending_total"
+          ]
+        },
+        {
+          "id": "combine",
+          "title": "One more thing it can do",
+          "duration": 5,
+          "narration": "",
+          "visual": {
+            "kind": "diagram",
+            "description": "One more thing it can do",
+            "headline": "One more thing it can do",
+            "lines": [
+              "Record → total → group → report",
+              "Ordinary Lisp composition"
+            ],
+            "caption": "One more thing that it can do"
+          },
+          "evidence_ids": [
+            "budget_report"
+          ]
+        },
+        {
+          "id": "running",
+          "title": "Keep it running",
+          "duration": 5,
+          "narration": "",
+          "visual": {
+            "kind": "capture",
+            "description": "Keep it running",
+            "headline": "Keep it running",
+            "lines": [
+              "Pause · repair · resume",
+              "The original call continues"
+            ],
+            "caption": "Keep it running, make it new"
+          },
+          "evidence_ids": [
+            "repair_resume"
+          ]
+        },
+        {
+          "id": "keep",
+          "title": "Keep what you built",
+          "duration": 5,
+          "narration": "",
+          "visual": {
+            "kind": "capture",
+            "description": "Keep what you built",
+            "headline": "Keep what you built",
+            "lines": [
+              "Accepted code",
+              "Accepted data",
+              "A fresh process"
+            ],
+            "caption": "Say the word, watch it grow"
+          },
+          "evidence_ids": [
+            "fresh_recovery"
+          ]
+        },
+        {
+          "id": "jiti",
+          "title": "Jiti",
+          "duration": 5,
+          "narration": "",
+          "visual": {
+            "kind": "title",
+            "description": "Jiti",
+            "headline": "Jiti",
+            "lines": [
+              "Grow a running Lisp application",
+              "by chatting with it",
+              "Run it · inspect it · build on it"
+            ],
+            "caption": "Original instrumental demo; vocal master tracked separately"
+          },
+          "evidence_ids": []
+        }
+      ]
+    }
+  ],
+  "audio": {
+    "narrator": {
+      "language": "en",
+      "style": "Conversational, clear, curious; pronounce Jiti as jih-tee and Lisp as lisp.",
+      "provider": "Runway speech provider, when successful; generated metadata records the actual provider and voice."
+    },
+    "music": {
+      "title": "Say the Word",
+      "bpm": 128,
+      "meter": "4/4",
+      "key": "C major",
+      "full_duration": 60,
+      "trailer_duration": 30,
+      "lyrics_file": "music/say-the-word.md",
+      "vocal_master_status": "Generate and verify a sung master through the configured provider. Mark incomplete until audio exists; instrumental-only fallback must be labeled.",
+      "mix": "Instrumental beneath narration at a clearly lower level; vocals reserved for the music trailer.",
+      "provider": "Runway music provider with a locally configured API credential; no credential contents enter launch assets."
+    }
+  },
+  "delivery": {
+    "captions": "Per-scene narration with timed phrase captions; distribute editable SRT and plain transcripts.",
+    "thumbnails": "One unique title thumbnail per video; avoid implied screenshots without captured evidence.",
+    "evidence": "Keep raw recordings, actual definitions, and provenance alongside render metadata.",
+    "publishing": "Local deliverables only; no external publication is authorized."
+  }
+}
