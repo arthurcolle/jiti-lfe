@@ -1,140 +1,163 @@
-# Live image repair
+# Jiti
 
-A generic cooperative SBCL kernel for developing and executing a running Lisp application through chat. Application functionality is supplied by your prompts and world adapter, not built into the kernel. A worker retains a failed call's live restarts while an external controller evaluates repair forms or resumes the call. Accepted registered code and data can survive process restarts.
+**Grow a running Lisp application by talking to it.**
 
-Grow an expense tracker from an empty application catalogue:
+Jiti is a cooperative kernel for developing and using a live Common Lisp application through chat. Ask for a function, try it against the application's data, then ask for another capability that builds on it. Accepted definitions remain available to later requests and can be recovered in a fresh process.
 
-```sh
-devenv shell -- image-repl --program examples/expense-tracker.lisp --store .image-agent/workspaces/expenses/
+Application behaviour comes from the Lisp you add and the resources your world adapter supports. You can start with an empty function catalogue or extend an existing application. The same interface lets you inspect definitions, execute expressions, preview changes, and repair a paused call.
+
+An illustrative conversation:
+
+```text
+chat> Add uppercase-string. Return an uppercased copy of the input.
+chat> Add reverse-string. Return a reversed copy without modifying the input.
+chat> Uppercase "Hello", then reverse the result using those functions.
+chat> Save that combination as shout-backwards.
+chat> /describe shout-backwards
+chat> /execute (shout-backwards "Hello")
 ```
 
-The [launch production package](launch/README.md) contains ten video scripts, a reproducible capture/render pipeline, and the original “Say the Word” music brief. The expense adapter supplies caller-owned checks; chat supplies its functions. Saved recordings distinguish actual model-generated code from deterministic demonstrations of repair and rollback.
+The resulting composition is ordinary Lisp:
 
-Run a live evolution experiment:
-
-```sh
-devenv shell -- experiment-reverse
+```lisp
+(defun shout-backwards (text)
+  (reverse-string (uppercase-string text)))
 ```
 
-The Lisp process starts with no `reverse-string`, builds a prompt from its goal, and asks OpenAI to add the function through registered tools. Caller-owned tests verify 21 fixed Unicode examples and 1,000 generated cases. Lisp automatically prompts again on failure, bounded by three rounds, 20 tools per round, 100 worker actions, and a 600-second external watchdog. No reversal implementation is supplied to the live proposer.
+Each accepted function joins an inspectable catalogue with its arguments, documentation and source. Once defined, it runs as Lisp; calling it does not inherently require model inference.
 
-Success requires a freshly allocated output string on each invocation, unchanged input, and reversal of the **original logical grapheme clusters**. Emoji sequences and combining accents retain their internal code points. RTL/LTR rendering still follows Unicode bidi rules; directional controls are preserved as input units rather than rebalanced for display. Cluster boundaries can change after reversal, so universal double-reversal identity is deliberately not asserted. Generated expectations use the pinned SBCL UAX #29 segmentation; fixed examples have independent expected outputs. Unicode behavior follows that runtime, rather than promising a different Unicode release.
-
-The experiment prints actual outputs, expected outputs, and code points. It then launches a fresh SBCL process to execute the recovered function, rolls back to remove it, and restores the successful implementation into a new revision. Each run uses a fresh `.image-agent/experiments/reverse-TIME-PID/` workspace; `--store FRESH-DIRECTORY` selects another location, and `--seed INTEGER` changes the generated cases. Existing experiment stores are preserved and rejected for a new run.
-
-Artifacts include `experiment.txt`, the kernel journal and immutable revisions, `generated-source.lisp` containing the actual model-created definitions, and minimized failures under `counterexamples/`. To reproduce a failure offline:
+Install [Nix and devenv](https://devenv.sh/getting-started/), then start the terminal application:
 
 ```sh
-devenv shell -- experiment-reverse --replay .image-agent/experiments/reverse-TIME-PID/counterexamples/failure-1.sexp
-```
-
-A reproduced failure exits with status 1; a passing replay exits with status 0. Replay evaluates the recorded managed definitions, so use trusted local artifacts. Credentials are resolved through the same local Underclass/environment configuration as the REPL and never written into experiment artifacts.
-
-Start the loaded-program CLI:
-
-```sh
+git clone https://github.com/ghuntley/jiti.git
+cd jiti
 devenv shell -- image-repl
 ```
 
-Interactive terminals use a scrolling, coloured interface with editable multiline input, syntax highlighting, function listings, and live restart panels. Enter submits chat or a complete Lisp form; incomplete Lisp continues on another line. Alt+Enter (or Esc then Enter) always inserts a newline. Left/right edit text; up/down move between rows and recall whole submissions at the buffer edges. Ctrl+C clears the current draft without aborting a paused call; Ctrl+D exits when the buffer is empty. Pasting never submits automatically.
+The development environment supplies SBCL, Lisp libraries, Python and the terminal dependencies. The default application has a managed `*state*` table containing `:x`, initially zero, and a `counter` function. Its workspace is `.image-agent/workspaces/demo/`. Reopening the same workspace recovers accepted code and data.
 
-Input history is saved per workspace in `input-history.txt` with permissions `0600`, including submitted chat prompts and commands. Delete that file to clear it. Model replies and conversation context remain in memory. Use `--no-emoji` to disable decorative emoji, `NO_COLOR=1` to disable colours, or `--plain` for the line interface. Pipes and `TERM=dumb` select the plain interface automatically. Unicode input is preserved; glyph appearance depends on your terminal and font. The rich display escapes control sequences and directional formatting controls from application output.
+For chat, configure a model and either a credential file or `OPENAI_API_KEY`:
 
-The demo has a `*state*` table with `:x` initially zero and a `(counter)` function. Type natural language to OpenAI, or use commands:
+```sh
+export OPENAI_MODEL='your-model-id'
+export OPENAI_API_KEY_FILE='/absolute/path/to/api-key'
+devenv shell -- image-repl
+```
+
+`OPENAI_BASE_URL` optionally selects a service implementing the Responses API; the default is `https://api.openai.com/v1`. The launcher also discovers local Underclass configuration. Explicit environment settings take precedence, and `--model NAME` overrides model selection. Credentials are excluded from diagnostic records and failure artifacts.
+
+Manual Lisp works without model credentials. Try this in a separate workspace:
+
+```sh
+devenv shell -- image-repl --store .image-agent/workspaces/manual/
+```
 
 ```text
-chat> Add uppercase-string that returns an uppercased copy of a string.
-chat> Add Unicode-aware reverse-string, preserving original grapheme clusters.
-chat> Uppercase "Hello 👋", then reverse it. Execute using existing functions.
-chat> Save that composition as shout-backwards.
-chat> /functions
-chat> /describe shout-backwards
-chat> /execute (shout-backwards "Hello 👋")
+chat> /develop (defun twice (x) "Double X." (* x 2))
+chat> /execute (twice (twice 3))
 chat> /preview (incf (gethash :x *state*))
-chat> /operations
+chat> /execute (counter)
+chat> /functions
 chat> /history
-chat> /context
-chat> /compact
-chat> Roll back to revision 1.
-chat> /mode lisp
-lisp> (counter)
-lisp> /mode chat
-chat> /model
-chat> /model gpt-6-astra
 chat> /quit
 ```
 
-Restart the same command to recover accepted state. The default demo workspace is `.image-agent/workspaces/demo/`; `/status` shows the revision, observation generation, checks, and restart menu. `/rollback previous` restores the current revision's parent and creates a new revision, preserving history. `/develop FORM` adds or redefines functionality; `/execute FORM` calls it; `/preview FORM` returns values and restores managed state; `/chat TEXT` sends chat from either mode. Forms may span lines. `/abort` unwinds a paused attempt; EOF and `/quit` close the worker and restore provisional changes. `/help` lists commands. Bare forms in Lisp mode execute normally, including supported definitions.
+The nested call returns `12`. Preview returns `1` while restoring the counter to `0`. Reopen the same workspace to call `twice` again. This exercises definition, composition, managed preview and recovery entirely locally.
 
-Remove an accepted function by asking in chat, or use `/develop (fmakunbound 'function-name)`. Removal creates a revision and updates the catalogue; removing an already absent local function creates no revision. Callers remain in the application. The model can point out visible references, but computed calls cannot be exhaustively identified. If a caller later reaches the missing function, its condition can be repaired through the live restart workflow. Caller-owned safety checks may reject removal. Use `/preview (fmakunbound 'function-name)` to try it without retaining the change, or `/rollback previous` to restore an accepted deletion. Requested caller repairs and deletion can share one `PROGN` transaction.
+The model connects to Lisp through a tool loop:
 
-Compose functions with ordinary Lisp, for example `(reverse-string (uppercase-string "Hello 👋"))`. No pipeline language or wrapper definition is required. Save a named composition only when you want another reusable building block. The catalogue comes from current managed definitions and survives process recovery.
+```mermaid
+flowchart LR
+    U[Your request] --> M[Model service]
+    M -->|Tool call| C[Controller]
+    C -->|Validated action| W[Persistent SBCL worker]
+    W -->|Values, checks, or a live pause| C
+    C -->|Actual result| M
+    W --- A[Application functions and managed data]
+```
 
-Every development or execution attempt gets an operation ID and a diagnostic journal record. Pure calls, identical definitions, and final-state no-ops create no revision. Successful managed code or data changes create one revision; explicit rollback always publishes a new revision. Observation generations advance independently for worker coordination. `/operations` shows recent attempts, including failures and previews, rather than application versions. Unfinished operations are marked interrupted on recovery and never replayed.
+The controller supplies instructions, registered tool descriptions, conversation context and current worker observations. The model can inspect available functions, read source, request development, or execute an expression. Complete tool calls are validated and routed one at a time. The next model request receives the actual outcome.
 
-Ordinary execution retains safe managed changes. Preview restores the same checkpoint after successful execution or failure, including repairs made while paused. It cannot undo unmanaged external effects such as sending a network request. Results are bounded printable values with truncation flags, not live object references.
+`develop_form` adds, redefines or removes functionality; `execute_form` uses existing functionality. Both share one evaluator and transaction engine. Other tools expose caller checks, operations, revision history, rollback, restart resumption and attempt abortion. Observation generations guard against stale actions; revision IDs identify saved application states.
 
-The CLI loads local Underclass settings automatically. Environment variables override local configuration, and `--model` overrides model selection. Manual Lisp works without API credentials. Chat has a default limit of 20 tool calls per prompt; the worker has a 1,000-action session budget. Set `--tool-limit` and `--budget` at startup. On budget exhaustion, quit and reopen the workspace to recover. Model switching affects future requests and resets conversation context. Transport failures preserve local world state and any live pause. Conversation context and model replies are not persisted; the terminal stores submitted input history as described above.
+One persistent worker thread owns live evaluation for each managed world. The controller exchanges actions and observations with it through mailboxes. This ownership preserves the active stack across prompts, including the dynamic extent of a paused restart. [The kernel diagram](launch/kernel-diagrams/02-kernel-ownership.svg) shows these boundaries.
 
-Conversation memory compacts automatically before a request reaches the configured threshold, including between completed tool exchanges during one prompt. The same prompt then continues. `/compact` compacts manually; `/context` shows usage, window, threshold, backend, and compaction count; `/context clear` explicitly forgets conversation memory. These commands preserve the live worker and paused restarts and spend no worker actions. Compaction does not reset the per-prompt tool budget.
+A world adapter tells the kernel what it manages. It supplies the evaluation package, observations, function catalogue, checkpoints and restoration, a deterministic managed-state representation, and export/import hooks for persistence. The reference adapter covers direct named `defun` definitions, supported function removals, and readable data in a state table. Additional resources require adapter hooks that cover their effects and recovery.
 
-The default working window is 65,536 tokens, with compaction at 70% and 8,192 tokens reserved for output and reasoning. Set `--context-tokens N` and optionally `--compact-threshold N` (both in tokens). This is a configured working budget, not automatic discovery of a model's maximum context. Request estimates include instructions, tool schemas, history, and Unicode UTF-8 bytes. Near the threshold, the controller uses `/responses/input_tokens` if supported; otherwise it uses an estimate calibrated against reported input usage. `/context` and the toolbar label local estimates; `/context` also reports the last measured request count and method.
+Every development or execution attempt takes a checkpoint before reading, compilation and evaluation. Ordinary execution retains successful safe managed changes. An explicit preview returns bounded printable results and restores the checkpoint. The caller supplies two distinct kinds of executable checks:
 
-Compaction prefers `/responses/compact` and passes its returned context forward intact. Gateways without that endpoint use an ordinary, tool-free Responses request to summarize goals, constraints, decisions, verified progress, and unfinished work. The summary fallback retains the latest prompt verbatim and two recent complete tool exchanges. Summaries are fallible; current worker state and actual tool results take precedence. If compaction fails or cannot free enough space, conversation memory and the live world remain available for retry. Compaction adds model latency and usage, and conversation memory remains session-only.
+| Check | Meaning | Effect |
+| --- | --- | --- |
+| Goals | Has the requested capability been achieved? | Unmet goals allow safe intermediate progress. |
+| Safety invariants | Is this candidate managed state acceptable? | Failed or signalled checks reject the attempt and restore its checkpoint. |
 
-Load your own managed application using `devenv shell -- image-repl --program app.lisp --store ./my-workspace/`. The file defines a factory in `CL-USER`:
+These checks belong to the caller. Model-generated implementation or a completion message cannot replace the acceptance contract. Interactive sessions remain available after goals pass; autonomous evolution requires executable goals.
+
+When application code signals an error, the worker can report the condition and available restarts while retaining the original call. The controller can request repair forms on that same worker, then invoke an offered restart within its live dynamic extent. The available continuation paths depend on the running program's restarts.
+
+Redefining a function preserves existing frames' bodies. Subsequent calls through non-inline global function names can reach updated definitions. The [scripted repair demonstration](launch/kernel-diagrams/03-paused-function-repair.svg) shows an original invocation returning through its version-one frame and the following invocation entering version two. The outer evaluation and its repairs share one provisional checkpoint; abort unwinds the attempt before restoration.
+
+There are three separate lifetimes to keep track of:
+
+| State | Lifetime |
+| --- | --- |
+| Conversation context | Session memory; can be compacted or cleared independently of the worker. |
+| Application execution | The live worker, including paused frames and restart identities. |
+| Accepted managed code and data | Durable revisions that can be imported into a fresh process. |
+
+Every attempt gets an operation identity and diagnostic record. Accepted changes create revisions; pure calls, identical definitions and final-state no-ops do not. The store publishes immutable revision artifacts and updates an atomic `CURRENT` pointer. Recovery imports accepted state, marks unfinished operations interrupted, and never replays them. Rollback publishes an earlier managed state as another revision, retaining the intervening history. Revisions currently require the same SBCL version.
+
+The terminal supports multiline input, editing, syntax highlighting and live restart panels. Enter submits complete input; Alt+Enter inserts a newline. Ctrl+C clears the input draft; `/abort` unwinds a paused attempt. `--plain` selects the line interface, which is also used for pipes. Submitted input is stored in the workspace's `input-history.txt` with permissions `0600`; model replies and conversation context remain session-only.
+
+| Command | Purpose |
+| --- | --- |
+| `/functions [OFFSET]`, `/describe NAME` | Browse the catalogue and inspect source. |
+| `/develop FORM`, `/execute FORM` | Change functionality or run an expression. |
+| `/preview FORM` | Return values and restore managed effects. |
+| `/status`, `/operations`, `/history` | Inspect the worker, recent attempts and accepted revisions. |
+| `/rollback ID\|NUMBER\|previous` | Restore an earlier state as a new revision. |
+| `/abort` | Unwind a paused attempt and restore its checkpoint. |
+| `/context`, `/compact`, `/context clear` | Inspect, compact or clear conversation memory. |
+| `/model [NAME]` | Inspect or switch the model; switching clears conversation context. |
+| `/mode chat\|lisp`, `/chat TEXT` | Switch input mode or send a prompt from either mode. |
+| `/help`, `/quit` | Show all commands or close the worker. |
+
+Chat defaults to 20 tool calls per prompt and a 1,000-action worker budget. `--tool-limit`, `--budget`, `--context-tokens` and `--compact-threshold` configure these bounds. Conversation compaction preserves the worker and any live pause. Fresh observations and tool results take precedence over summaries. Use `devenv shell -- image-repl --help` for startup options.
+
+To load your own application, create a Lisp file defining `CL-USER:MAKE-CLI-WORLD`:
 
 ```lisp
 (in-package :cl-user)
+
 (defun make-cli-world ()
-  (let ((world (image-agent:make-reference-world :initial '((:x . 42)))))
-    (list :id "my-app" :world world
-          :goals (list (cons :target
-                        (lambda () (= 7 (gethash :x (image-agent:reference-table world))))))
-          :invariants (list (cons :nonnegative
-                             (lambda () (>= (gethash :x (image-agent:reference-table world)) 0)))))))
+  (let* ((world (image-agent:make-reference-world :initial '((:x . 0))))
+         (table (image-agent:reference-table world)))
+    (list :id "my-app"
+          :world world
+          :invariants
+          (list (cons :nonnegative
+                      (lambda ()
+                        (let ((x (gethash :x table)))
+                          (and (integerp x) (>= x 0)))))))))
 ```
 
-`:id` must be stable and use letters, digits, hyphens, or underscores. Goals and invariants are optional for interactive use. The workspace checks adapter identity and allows only one CLI process at a time. Application resources beyond the reference adapter need your own snapshot/restore and export/import hooks. Interactive sessions stay available after goals pass.
+```sh
+devenv shell -- image-repl --program app.lisp --store .image-agent/workspaces/my-app/
+```
 
-OpenAI discovers registered tools for application inspection, function descriptions, development, execution, caller checks, operation history, revision listing, rollback, restart resumption, and attempt abortion. Catalogue pages contain up to 50 summaries; `inspect_world` starts at offset 0 and returns `next_offset`. `/functions [OFFSET]` provides the same paging in the terminal. Full source is available through `/describe NAME`. The controller validates arguments and routes world operations through the owning worker. Observation generations are stale-command guards; accepted revision numbers identify persistent history. Rollback restores managed code/data, not historical call stacks.
+The adapter ID must be stable and contain letters, digits, hyphens or underscores. Workspaces check adapter identity and permit one CLI process at a time. Add caller-owned `:goals` when you want executable completion criteria. [The expense example](examples/expense-tracker.lisp) demonstrates fixture-based goals and safety invariants starting with no application functions.
+
+For embedding, load the ASDF systems in [image-agent.asd](image-agent.asd). `image-agent` contains the core kernel and property checks; `image-agent/store` adds persistence and the reference world; `image-agent/openai` adds the Responses proposer; `image-agent/cli` adds tools and chat. `make-session`, `session-step` and `close-session` expose the worker protocol, while `run` drives it with an injected proposer. See [kernel.lisp](src/kernel.lisp), [reference-world.lisp](src/reference-world.lisp) and the [architectural decisions](docs/adr/) for the contracts.
+
+Verify the implementation locally:
 
 ```sh
 devenv shell test
+devenv test
 devenv shell test-stress
 devenv shell test-replay /tmp/image-agent-counterexample-424242.sexp
-devenv shell test-live
 ```
 
-`test` is deterministic and offline. `test-live` reads this machine's Underclass profile from Codex configuration unless environment variables override it. Other installations must provide `OPENAI_MODEL` and `OPENAI_API_KEY` or `OPENAI_API_KEY_FILE`, optionally `OPENAI_BASE_URL`. Credentials are not logged. `test-live` also asks the real model to add and compose functionality, then checks execution and fresh recovery. Tests have an external watchdog (180 seconds offline, 600 seconds live); adjust `TEST_TIMEOUT` for stress runs.
+`test` runs the deterministic offline Lisp suite. `devenv test` also runs ADR, CLI and terminal checks. Property failures retain replayable minimized traces. `devenv shell test-live` uses configured model credentials to verify real tool use, composition and fresh recovery. `devenv shell -- experiment-reverse` runs a bounded Unicode grapheme-reversal experiment with caller-owned fixed and generated checks, recovery, rollback and offline counterexample replay; see [experiments.lisp](src/experiments.lisp).
 
-Load `image-agent` for the core, `image-agent/store` for persistence and the reference world, and `image-agent/openai` for the Responses proposer. HTTP/JSON and test libraries are outside the core.
-
-```lisp
-(let* ((world (image-agent:make-reference-world :initial '((:x . 0))))
-       (session (image-agent:make-session
-                  world :goal "Set :x to 7"
-                  :goals (list (cons :seven
-                             (lambda () (= 7 (gethash :x (image-agent:reference-table world))))))
-                  :budget 10 :store #p"/tmp/my-image-revisions/")))
-  (unwind-protect
-       (let ((view (image-agent:session-step session)))
-         (image-agent:session-step
-           session (list :action :execute :source "(setf (gethash :x *state*) 7)"
-                         :generation (getf view :generation))))
-    (image-agent:close-session session)))
-```
-
-`session-step` accepts `:develop` or `:execute` with `:source`, and execution accepts optional `:preview t`. Inspection actions are `:inspect`, `:describe :name NAME`, and `:operations`. `session-step` returns `:idle`, `:paused`, `:success`, `:exhausted`, `:aborted`, or `:faulted`. Include the returned generation in every action. Paused views include temporary restart IDs; resume using `:action :resume :restart-id ID :arguments "(list ...)"`. `run` drives this protocol using an injected proposer. All attempts, including malformed actions and failed proposer requests, spend budget.
-
-A world supplies an evaluation package, bounded observation, checkpoint/restore, required `:managed-state` and `:catalogue` callbacks, and optional durable export/import, form-validation, and definition-recording callbacks. `:validate-form` receives the parsed, kernel-validated form before evaluation and must not mutate the world; signaling an error rejects the attempt. It defaults to no additional validation. Apply the same callback when initializing your own program outside worker execution. `:managed-state` returns a deterministic acyclic readable tree of managed code and data; the kernel captures its case-sensitive readable representation to compare final state. Keep this distinct from live checkpoints. `:catalogue` returns a list of entries with `:name` (string), `:arguments` (Lisp lambda list), `:documentation` (string or NIL), and `:source` (string). The reference adapter manages readable table values and direct named DEFUNs and literal local FMAKUNBOUND edits, rejecting unrecorded function changes rather than losing them during recovery. Other adapters can manage methods, classes, or other resources by supplying complete hooks. An outer form and repairs made while it is paused share one provisional checkpoint. Failed repair evaluation aborts that entire attempt. Checkpoints precede reading, compilation, and evaluation. False goals permit accepted intermediate revisions; false or signaled safety invariants reject them. Noninteractive sessions require nonempty goals; interactive sessions may omit them. Autonomous evolution always requires executable goals.
-
-`make-property-check` returns a named check usable among goals or invariants. Provide a generator function taking a size, an assertion taking a sample, seed, case budget, and optional shrink function. Each sample and shrink test restores its world checkpoint. Results include seed, completed case count and counterexample. Model-created tests cannot replace the caller's acceptance contract.
-
-Persistence publishes immutable world artifacts and a manifest, then flushes an atomic `CURRENT` pointer. `recover-session` imports the current revision and includes prior diagnostic history; it does not replay actions or restore old stacks. A torn diagnostic journal cannot change accepted state; recovery archives it before appending new records. Revisions currently require the same SBCL version.
-
-The reference adapter covers an equal-tested table of readable, acyclic scalar/list/vector/string values and direct named `defun` and `(fmakunbound 'local-name)` forms, including edits nested in `progn`. Computed targets, removal inside other control forms, and indirect FMAKUNBOUND references are rejected by this adapter's conservative validation. It preserves table identity and restores function cells. Definitions performed indirectly, macros, methods, classes, external I/O, background threads, closures captured from arbitrary frames, and other resources need a world adapter with appropriate coverage. Accepted definitions must be reconstructible from their exported source. Safety checks and observations must cooperate with the owning thread and avoid deadlocking on locks held by a paused call.
-
-Package locks and recursive syntax checks protect against mistakes, not arbitrary hostile Lisp. Computed calls, macro expansion, FFI, and resource exhaustion are outside that guarantee. Active frames and cached function objects retain their existing bodies; hot replacement relies on non-inline global dispatch. Hard crash/hang isolation belongs to an external process supervisor.
-
-Architectural decisions live in [docs/adr](docs/adr/). [AGENTS.md](AGENTS.md) invokes the repository's [ADR maintenance skill](skills/maintain-adrs/SKILL.md).
+Jiti assumes cooperative Lisp code. Managed checkpoints cover the adapter's declared resources; external I/O, background threads and arbitrary resource effects need appropriate integration. Package locks and form validation protect against mistakes, while crash, hang and hostile-code isolation require an external process boundary. Active frames, cached function objects and inline sites can retain earlier definitions. These boundaries are part of the kernel's design, alongside live worker ownership and durable managed state.
