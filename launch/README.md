@@ -2,9 +2,11 @@
 
 This package explains Jiti as **an application you grow by talking to it**. The flagship example starts with an empty managed expense ledger and no expense-tracker functions, then adds and composes useful functions inside a running Lisp image. The runtime, adapter, and caller-owned checks exist at startup.
 
-[manifest.json](manifest.json) is the editable source of truth for ten videos, 54 distinct scenes, and 12 minutes 15 seconds of primary footage. [scripts/](scripts/) contains the readable timed narration and storyboards. [launch-copy.md](launch-copy.md) contains the Hacker News submission draft and page copy. [music/say-the-word.md](music/say-the-word.md) contains the original lyric sheet, bar-accurate music brief, and generation prompt.
+[manifest.json](manifest.json) is the editable source of truth for ten videos, 54 distinct scenes, and 12 minutes 15 seconds of primary footage. [scripts/](scripts/) contains the readable timed narration and storyboards. [music/say-the-word.md](music/say-the-word.md) contains the original lyric sheet, bar-accurate music brief, and generation prompt.
 
 ## Deliverables
+
+[kernel-diagrams/](kernel-diagrams/) contains editable SVGs explaining the model/tool loop, controller and worker, live repair, and managed recovery. Rebuild PNG exports and mobile review images with `devenv shell -- python3 launch/kernel-diagrams/render.py`. [diagrams/](diagrams/) contains additional figures illustrating the expense example.
 
 | ID | Video | Duration | Formats |
 |---|---|---:|---|
@@ -36,13 +38,22 @@ Create recordings in fresh directories, generate audio once, then rerender entir
 ```sh
 devenv shell -- sbcl --noinform --script scripts/launch/expense_capture.lisp .image-agent/launch/scripted
 devenv shell -- launch-capture .image-agent/launch/live
-# Assemble the recordings using scripts/launch/assemble_evidence.py --help.
-devenv shell -- launch-audio --help
+python3 scripts/launch/assemble_evidence.py --scripted .image-agent/launch/scripted/capture.json --live .image-agent/launch/live/live-capture.json --output .image-agent/launch/evidence.json
+devenv shell -- launch-audio
+# Verify the sung master, then prepare its local trailer edit:
+devenv shell -- launch-audio --edit-trailer
 devenv shell -- launch-render
+devenv shell -- launch-package
 devenv shell -- test-launch
 ```
 
 The batch render creates `artifacts/launch/index.html`, ten horizontal videos, seven portrait versions, thumbnails, captions, transcripts, and retained source frames. Open the gallery locally to review. Capture and audio generation are separate explicit commands; `launch-render` uses `.image-agent/launch/evidence.json` and saved audio and never makes network requests. Existing recordings are preserved rather than overwritten.
+
+`launch-package` checks all 17 exports for their expected duration, dimensions, audio, and caption files. It copies the original song, narration, raw generation assets, captures, and editable sources into the deliverable folder, then records file hashes in `package-report.json`.
+
+`launch-audio` reads the Runway credential from `~/runway` by default; `--key-file` selects a different local file. It saves task IDs and request hashes to resume interrupted generation without silently spending again. Credentials and signed download URLs are never exported. The audio generator's metadata records the actual model, voice, duration, and any timing adjustments.
+
+Live capture verifies recovery after closing its original worker. To verify an existing successful capture again without model requests, run `devenv shell -- launch-capture .image-agent/launch/live --recover-only`; the original conversation remains in `model-conversation.json`.
 
 The implementation entry points are the expense-demo scripts under `scripts/launch/` and the Python renderer at `scripts/launch/render.py`. Use their `--help` output for current capture and render arguments. The renderer must rebuild from saved evidence and audio; a re-render must not silently make more model calls.
 
@@ -87,6 +98,6 @@ Use `--narration --only 01-grow-an-app` to generate one video's speech, or `--mu
 
 Audio is saved under `.image-agent/launch/audio/`, with raw model generations under `raw/` and safe task/provenance records under `state/`. A task ID and request hash are saved before polling. Rerunning resumes existing tasks and reuses verified files; a changed request or an ambiguous submission stops that asset to prevent accidental repeat charges. No authorization headers, signed output URLs, or provider error bodies enter saved metadata. Offline resume checks run with `python3 scripts/launch/test_runway_audio.py`.
 
-Narration uses Runway's `eleven_v4` model and Maya preset, normalized to a target of −16 LUFS. The script allows at most 1.3× time compression to fit a scene and never truncates speech. Music uses `seed_audio`; it preserves the generated master duration and records the measured duration. The requested 60-second sung master and instrumental each have their own original prompt. Listen and verify the actual vocal before editing the 30-second trailer or claiming lyric alignment. Keep the full vocal master, instrumental, raw sources, and generation metadata available for review.
+Narration uses Runway's `eleven_v4` model and Maya preset, normalized to a target of −16 LUFS. The script allows at most 1.3× time compression to fit a scene and never truncates speech. Music uses `seed_audio`; it preserves the generated master duration and records the measured duration. The requested 60-second sung master and instrumental each have their own original prompt. The current production generated both 60-second masters and all 48 narration scenes successfully. Offline transcription verified the sung lyrics. The reviewed 30-second trailer repeats the full final chorus at 42–60 seconds twice with 1.2× time compression; transcription recovered all four lines twice, including the first and final words. Rebuild that edit locally with `python3 scripts/launch/runway_audio.py --edit-trailer`, which makes no provider request. The initial 45-second cut clipped the opening phrase and was rejected. This recipe applies to the reviewed generated master; inspect any replacement performance before claiming lyric alignment. Keep the full vocal master, instrumental, raw sources, and generation metadata available for review.
 
 Provider references: [Runway API](https://docs.dev.runwayml.com/api/), [official model schemas](https://github.com/runwayml/sdk-python/tree/main/src/runwayml/types), and [Runway terms](https://runwayml.com/terms-of-use). The metadata records the provider and settings; users should consult the provider's terms for the account and intended distribution.

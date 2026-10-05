@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1410" viewBox="0 0 680 1410" role="img" aria-labelledby="title desc">
+<title id="title">The kernel keeps execution and acceptance coherent</title>
+<desc id="desc">The controller validates tool arguments and sends actions one at a time to a persistent worker, receiving observations and results in return. The worker owns evaluation, the live stack and active restarts. Inside that worker, the world adapter provides managed code and data, the function catalogue, checkpoint and restore, and durable export and import. Caller-supplied safety checks and goals are assessed at safe points. Safety determines whether a candidate may be kept; goals determine completion. Accepted managed changes publish durable revisions. The reference adapter covers named functions and readable table data.</desc>
+<rect width="680" height="1410" fill="#FAFAF7"/>
+<text x="40" y="49" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">02  /  A LIVING LISP APPLICATION</text>
+<text x="40" y="100" font-family="DejaVu Sans" font-size="34" font-weight="bold" text-anchor="start" fill="#182B2B">One worker owns the world.</text>
+<text x="40" y="140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">A small protocol around a live Lisp application.</text>
+<rect x="40" y="178" width="600" height="117" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="219" font-family="DejaVu Sans" font-size="22" font-weight="bold" text-anchor="start" fill="#007E70">CONTROLLER</text>
+<text x="64" y="260" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#182B2B">Validate arguments. Route actions serially.</text>
+<polyline points="248,303 248,400" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="242,390 254,390 248,400" fill="#007E70"/>
+<polyline points="437,400 437,303" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="431,313 443,313 437,303" fill="#007E70"/>
+<text x="62" y="356" font-family="DejaVu Sans" font-size="23" font-weight="normal" text-anchor="start" fill="#4C6060">Actions</text>
+<text x="458" y="356" font-family="DejaVu Sans" font-size="23" font-weight="normal" text-anchor="start" fill="#4C6060">Results</text>
+<rect x="40" y="408" width="600" height="753" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="451" font-family="DejaVu Sans" font-size="23" font-weight="bold" text-anchor="start" fill="#007E70">PERSISTENT WORKER</text>
+<text x="64" y="488" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Owns live application operations</text>
+<rect x="64" y="522" width="552" height="135" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="86" y="561" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">LISP EVALUATION</text>
+<text x="86" y="601" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Running code + live call stack</text>
+<text x="86" y="636" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#182B2B">Active restarts stay on this thread.</text>
+<rect x="64" y="683" width="552" height="177" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="86" y="722" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">WORLD ADAPTER</text>
+<text x="86" y="762" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Managed code, data and catalogue</text>
+<text x="86" y="800" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Checkpoint / restore</text>
+<text x="86" y="838" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Durable export / import</text>
+<rect x="64" y="886" width="552" height="236" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="86" y="925" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">CALLER CHECKS · AT SAFE POINTS</text>
+<text x="86" y="970" font-family="DejaVu Sans" font-size="26" font-weight="bold" text-anchor="start" fill="#182B2B">Safety</text>
+<text x="86" y="1006" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">May this candidate be kept?</text>
+<text x="86" y="1048" font-family="DejaVu Sans" font-size="26" font-weight="bold" text-anchor="start" fill="#182B2B">Goals</text>
+<text x="86" y="1084" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Is the requested work complete?</text>
+<polyline points="590,1169 590,1232" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="584,1222 596,1222 590,1232" fill="#007E70"/>
+<text x="64" y="1205" font-family="DejaVu Sans" font-size="23" font-weight="normal" text-anchor="start" fill="#4C6060">Accepted managed changes</text>
+<rect x="40" y="1240" width="600" height="103" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="1280" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">DURABLE REVISION STORE</text>
+<text x="64" y="1318" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Accepted code + data, with history</text>
+<text x="40" y="1387" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">The adapter defines what can be restored.</text>
+</svg>

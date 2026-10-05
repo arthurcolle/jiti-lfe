@@ -10,7 +10,7 @@ Visual: Say the word
 
 On screen: “Let me record an expense.” / A new function appears
 
-Caption: Original theme: Say the Word
+Caption: [Original song: Say the Word]
 
 Evidence: record_expense
 
@@ -22,7 +22,7 @@ Visual: Watch it grow
 
 On screen: Coffee · Groceries · Transport / The ledger becomes useful
 
-Caption: Piece by piece, see where it goes
+Caption: [Original song: Say the Word]
 
 Evidence: spending_total
 
@@ -34,7 +34,7 @@ Visual: One more thing it can do
 
 On screen: Record → total → group → report / Ordinary Lisp composition
 
-Caption: One more thing that it can do
+Caption: [Original song: Say the Word]
 
 Evidence: budget_report
 
@@ -46,7 +46,7 @@ Visual: Keep it running
 
 On screen: Pause · repair · resume / The original call continues
 
-Caption: Keep it running, make it new
+Caption: [Original song: Say the Word]
 
 Evidence: repair_resume
 
@@ -58,7 +58,7 @@ Visual: Keep what you built
 
 On screen: Accepted code / Accepted data / A fresh process
 
-Caption: Say the word, watch it grow
+Caption: [Original song: Say the Word]
 
 Evidence: fresh_recovery
 
@@ -70,6 +70,6 @@ Visual: Jiti
 
 On screen: Grow a running Lisp application / by chatting with it / Run it · inspect it · build on it
 
-Caption: Original instrumental demo; vocal master tracked separately
+Caption: [Original song: Say the Word]
 
 Narration: [Music only. Do not substitute synthesized speech for a sung vocal.]

@@ -1115,7 +1115,7 @@
               "“Let me record an expense.”",
               "A new function appears"
             ],
-            "caption": "Original theme: Say the Word"
+            "caption": "[Original song: Say the Word]"
           },
           "evidence_ids": [
             "record_expense"
@@ -1134,7 +1134,7 @@
               "Coffee · Groceries · Transport",
               "The ledger becomes useful"
             ],
-            "caption": "Piece by piece, see where it goes"
+            "caption": "[Original song: Say the Word]"
           },
           "evidence_ids": [
             "spending_total"
@@ -1153,7 +1153,7 @@
               "Record → total → group → report",
               "Ordinary Lisp composition"
             ],
-            "caption": "One more thing that it can do"
+            "caption": "[Original song: Say the Word]"
           },
           "evidence_ids": [
             "budget_report"
@@ -1172,7 +1172,7 @@
               "Pause · repair · resume",
               "The original call continues"
             ],
-            "caption": "Keep it running, make it new"
+            "caption": "[Original song: Say the Word]"
           },
           "evidence_ids": [
             "repair_resume"
@@ -1192,7 +1192,7 @@
               "Accepted data",
               "A fresh process"
             ],
-            "caption": "Say the word, watch it grow"
+            "caption": "[Original song: Say the Word]"
           },
           "evidence_ids": [
             "fresh_recovery"
@@ -1212,7 +1212,7 @@
               "by chatting with it",
               "Run it · inspect it · build on it"
             ],
-            "caption": "Original instrumental demo; vocal master tracked separately"
+            "caption": "[Original song: Say the Word]"
           },
           "evidence_ids": []
         }
@@ -1233,9 +1233,11 @@
       "full_duration": 60,
       "trailer_duration": 30,
       "lyrics_file": "music/say-the-word.md",
-      "vocal_master_status": "Generate and verify a sung master through the configured provider. Mark incomplete until audio exists; instrumental-only fallback must be labeled.",
+      "vocal_master_status": "Generated60second sung master through Runway seed_audio; production QA transcribed the supplied lyrics. See generated task and asset metadata.",
       "mix": "Instrumental beneath narration at a clearly lower level; vocals reserved for the music trailer.",
-      "provider": "Runway music provider with a locally configured API credential; no credential contents enter launch assets."
+      "provider": "Runway music provider with a locally configured API credential; no credential contents enter launch assets.",
+      "instrumental_status": "Separate60second companion instrumental generation; not an isolated stem from the vocal master.",
+      "trailer_edit": "Repeat the verified complete final chorus42–60seconds twice and apply atempo1.2 for30seconds; rebuild locally with --edit-trailer. Requested master tempo128BPM is a generation target, not a measured claim."
     }
   },
   "delivery": {

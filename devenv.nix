@@ -14,7 +14,8 @@ in {
   scripts.launch-capture.exec = ''python3 scripts/launch/chat_capture.py "$@"'';
   scripts.launch-audio.exec = ''python3 scripts/launch/runway_audio.py "$@"'';
   scripts.launch-render.exec = ''python3 scripts/launch/render.py --evidence .image-agent/launch/evidence.json --audio-dir .image-agent/launch/audio --music .image-agent/launch/audio/instrumental.wav --song .image-agent/launch/audio/trailer.wav "$@"'';
-  scripts.test-launch.exec = ''python3 tests/launch_capture_scenarios.py && python3 scripts/launch/test_render.py'';
+  scripts.launch-package.exec = ''python3 scripts/launch/package.py "$@"'';
+  scripts.test-launch.exec = ''python3 tests/launch_capture_scenarios.py && python3 tests/launch_evidence_scenarios.py && python3 scripts/launch/test_render.py && python3 scripts/launch/test_runway_audio.py'';
   enterTest = ''
     bash scripts/run-tests.sh test
     python3 scripts/check-adrs.py

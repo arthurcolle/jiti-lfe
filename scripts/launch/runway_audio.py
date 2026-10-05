@@ -235,6 +235,29 @@ def generate(job, client, output, ffmpeg, ffprobe):
     return state
 
 
+
+def edit_trailer(output, ffmpeg, ffprobe):
+    """Rebuild the reviewed 30s chorus edit locally; never contact the provider."""
+    source = output / "music" / "say-the-word-vocal-master.wav"
+    target = output / "trailer.wav"
+    if not source.exists() or duration(source, ffprobe) < 59.99:
+        raise AudioError("The trailer recipe requires the completed 60-second vocal master")
+    run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", str(source),
+         "-filter_complex", "[0:a]atrim=start=42:end=60,asetpts=PTS-STARTPTS,asplit=2[first][second];[first][second]concat=n=2:v=0:a=1[joined];[joined]atempo=1.2,apad=whole_dur=30,atrim=duration=30[out]",
+         "-map", "[out]", "-ar", "48000", "-ac", "2", "-c:a", "pcm_s16le", str(target)])
+    measured = duration(target, ffprobe)
+    if abs(measured - 30) > 0.025:
+        raise AudioError("Trailer edit did not produce 30 seconds")
+    save_json(output / "music" / "trailer-edit.json", {
+        "source": str(source), "source_sha256": digest(source), "output": str(target),
+        "output_sha256": digest(target), "duration_seconds": measured,
+        "recipe": [{"start_seconds":42,"end_seconds":60},{"start_seconds":42,"end_seconds":60}],
+        "atempo":1.2, "provider_calls":0, "duration_fit":"Pad or trim sub-frame tail after tempo processing to exactly 30 seconds",
+        "review": "Complete final chorus repeated; offline QA must recover the opening Say the word and all four lines twice."})
+    print("Ready music/trailer: 30.00s, complete final chorus repeated at 1.2x tempo", flush=True)
+    return target
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=Path("launch/manifest.json"))
@@ -247,11 +270,15 @@ def main():
     parser.add_argument("--timeout", type=int, default=600, help="Finite polling timeout per task")
     parser.add_argument("--ffmpeg")
     parser.add_argument("--ffprobe")
+    parser.add_argument("--edit-trailer", action="store_true", help="Locally rebuild 30s trailer from reviewed 42–60s chorus twice at 1.2x; no API calls")
     parser.add_argument("--dry-run", action="store_true", help="Validate and list requests without loading credentials or calling API")
     args = parser.parse_args()
     try:
         if args.timeout < 1 or args.timeout > 1800:
-            raise AudioError("Timeout must be between1and1800seconds")
+            raise AudioError("Timeout must be between 1 and 1800 seconds")
+        if args.edit_trailer:
+            edit_trailer(args.output, binary("ffmpeg", args.ffmpeg), binary("ffprobe", args.ffprobe))
+            return 0
         manifest = json.loads(args.manifest.read_text())
         both = not args.narration and not args.music
         jobs = tasks_from_manifest(manifest, set(filter(None, (args.only or "").split(","))), args.narration or both, args.music or both)

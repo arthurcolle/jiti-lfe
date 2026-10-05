@@ -2,7 +2,7 @@
 
 Original launch theme for Jiti. A bright, singable synth-pop song about incrementally building a running application. Lyrics and composition brief below are newly written for this project; do not imitate a named recording artist or reuse an existing melody.
 
-The delivery target is a sung 60-second master, a 30-second vocal trailer edit, and an instrumental bed. A synthesized instrumental is a useful local production asset. It is not a completed sung master. Keep the vocal deliverable marked pending until the configured Runway music provider has produced it and its usage terms have been recorded. Keep the API credential in its local configuration file; it is not an input to any scene, transcript, or artifact.
+Runway `seed_audio` generated an actual 60-second sung master and a separate 60-second companion instrumental for this production. Offline speech recognition recovered the supplied lyrics from the sung master. The instrumental is a separate arrangement, not an isolated stem. Generated task and asset metadata records actual output hashes and status. Keep the API credential in its local configuration file; it is not an input to any scene, transcript, or artifact.
 
 ## Composition
 
@@ -34,7 +34,7 @@ The delivery target is a sung 60-second master, a 30-second vocal trailer edit, 
 
 ## 30-second trailer edit
 
-Sixteen bars, beginning directly on the chorus. Use master bars 13–20 followed by bars 25–32, with a musically clean edit. This produces two passes through the hook in exactly thirty seconds. Arrange the final pass with a brief stop before the final resolution so the Jiti title is readable. Preserve the final duration rather than appending a reverb tail.
+The production edit repeats the generated master’s complete final chorus (42–60 seconds) twice, then applies 1.2× tempo to fit exactly 30 seconds. Offline transcription recovered the full opening “Say the word” from this source cut; the provisional 45-second cut clipped that phrase and was rejected. The final chorus follows the supplied lyric order. The 128 BPM specification is the requested generation target, not a measured claim about the resulting performance. Rebuild this local edit with `python3 scripts/launch/runway_audio.py --edit-trailer`; this command never calls the provider. Inspect the opening syllable and final word against the resulting audio. This explicit recipe supersedes the provisional first-chorus-plus-final-chorus arrangement, because the generated first chorus is longer than the nominal score.
 
 The six five-second trailer scenes deliberately do not all coincide with bar boundaries; the visuals follow the story while the song holds its regular pulse. Place the highest emphasis at the first useful result, the resumed call, and the final title.
 

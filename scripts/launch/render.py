@@ -259,7 +259,7 @@ class Composer:
                 if "deterministic" in provenance or "scripted" in provenance or "seed" in provenance:
                     modes.add("scripted")
             if modes == {"model"}:
-                label = "RECORDED MODEL TOOL RESULT · EXCERPT"
+                label = "RECORDED MODEL-BUILT APP · EXCERPT"
             elif modes == {"scripted"}:
                 label = "SCRIPTED KERNEL EXECUTION · EXCERPT"
             elif modes == {"model","scripted"}:
@@ -523,6 +523,8 @@ def write_gallery(output,records):
     content = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     content += '<title>Jiti launch films</title><style>body{background:#101521;color:#f4f5f8;font:16px system-ui;max-width:1400px;margin:40px auto;padding:0 24px}a{color:#77e4b4}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:32px}article{background:#192232;padding:24px;border-radius:16px}video{width:100%;max-height:620px}p{color:#aab8ce}h2{font-size:22px}</style>'
     content += '<h1>Jiti · Grow an application by talking to it</h1><p>Local review copies. Diagrams are labelled; recorded output is traceable to <a href="evidence.json">saved execution evidence</a>. Captions are burned in and available separately.</p><main>'
+    if (output/"audio"/"song.wav").exists():
+        content += '<article><h2>Say the Word · original song</h2><p>60-second sung master</p><audio controls preload="metadata" src="audio/song.wav"></audio><p><a href="audio/song.wav">Vocal master WAV</a> · <a href="audio/instrumental.wav">Companion instrumental</a> · <a href="audio/trailer.wav">30-second trailer edit</a></p></article>'
     content += "".join(cards) + '</main></html>'
     (output/"index.html").write_text(content)
 
@@ -553,7 +555,8 @@ def main(argv=None):
     parser.add_argument("--scale",type=float,default=1.0,help="Use a smaller scale for draft review; default 1 is 1080p")
     parser.add_argument("--validate-only",action="store_true",help="Check the manifest and evidence without producing files")
     args = parser.parse_args(argv)
-    manifest,evidence = read_json(args.manifest),read_json(args.evidence)
+    manifest_text, evidence_text = args.manifest.read_text(), args.evidence.read_text()
+    manifest,evidence = json.loads(manifest_text),json.loads(evidence_text)
     validate_manifest(manifest,evidence)
     if args.validate_only:
         print(f"Validated {len(manifest['videos'])} videos and {len(evidence.get('sections',{}))} evidence sections")
@@ -566,14 +569,14 @@ def main(argv=None):
     ffmpeg,ffprobe = locate_binary("ffmpeg"),locate_binary("ffprobe")
     args.output.mkdir(parents=True,exist_ok=True)
     # Keep exact inputs alongside rendered deliverables so every claim can be audited.
-    (args.output/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
-    (args.output/"evidence.json").write_text(json.dumps(evidence,indent=2)+"\n")
+    (args.output/"manifest.json").write_text(manifest_text)
+    (args.output/"evidence.json").write_text(evidence_text)
     records = []
     for video in videos:
         records += render_video(video,evidence,args.output,args.audio_dir,args.music,ffmpeg,ffprobe,
                                 manifest.get("fps",24),args.scale,[args.orientation] if args.orientation else None,args.song)
-    result = {"manifest_sha256":hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
-              "evidence_sha256":hashlib.sha256(args.evidence.read_bytes()).hexdigest(),"outputs":records}
+    result = {"manifest_sha256":hashlib.sha256(manifest_text.encode()).hexdigest(),
+              "evidence_sha256":hashlib.sha256(evidence_text.encode()).hexdigest(),"outputs":records}
     report_path = args.output/"render-report.json"
     if report_path.exists() and (args.only or args.orientation):
         result,merged = merge_report(read_json(report_path),result)

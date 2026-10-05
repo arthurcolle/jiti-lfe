@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1264" viewBox="0 0 680 1264" role="img" aria-labelledby="title desc">
+<title id="title">Accepted code and data survive the process</title>
+<desc id="desc">Accepted managed function definitions and data are saved as durable revisions. A fresh process imports the accepted revision; recovered functions are callable with their saved data. Live call stacks and chat memory are not part of this recovery. The rollback example preserves revisions 1, 2 and 3, then publishes revision 4 containing the managed state from revision 1. Revision 4 follows revision 3 in history, preserving intervening accepted states. Revision numbers are illustrative.</desc>
+<rect width="680" height="1264" fill="#FAFAF7"/>
+<text x="40" y="49" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">04  /  A LIVING LISP APPLICATION</text>
+<text x="40" y="100" font-family="DejaVu Sans" font-size="34" font-weight="bold" text-anchor="start" fill="#182B2B">Keep the state. Keep history.</text>
+<text x="40" y="140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">Managed recovery and explicit rollback.</text>
+<rect x="40" y="178" width="600" height="112" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="219" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">ACCEPTED APPLICATION STATE</text>
+<text x="64" y="261" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Function definitions + managed data</text>
+<polyline points="340,298 340,329" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,319 346,319 340,329" fill="#007E70"/>
+<rect x="40" y="337" width="600" height="105" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="378" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">SAVED REVISION</text>
+<text x="64" y="419" font-family="DejaVu Sans" font-size="27" font-weight="normal" text-anchor="start" fill="#182B2B">Durable code and data</text>
+<polyline points="340,450 340,482" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,472 346,472 340,482" fill="#007E70"/>
+<rect x="40" y="490" width="600" height="150" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="532" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">FRESH PROCESS</text>
+<text x="64" y="574" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Load the accepted revision.</text>
+<text x="64" y="611" font-family="DejaVu Sans" font-size="27" font-weight="bold" text-anchor="start" fill="#182B2B">Call the recovered functions.</text>
+<text x="40" y="681" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#4C6060">Live stacks are not persisted.</text>
+<text x="40" y="717" font-family="DejaVu Sans" font-size="22" font-weight="normal" text-anchor="start" fill="#4C6060">Chat memory is separate from application state.</text>
+<polyline points="40,747 640,747" fill="none" stroke="#C9D5D1" stroke-width="1.5" stroke-linejoin="round"/>
+<text x="40" y="790" font-family="DejaVu Sans" font-size="22" font-weight="bold" text-anchor="start" fill="#007E70">ROLLBACK APPENDS A REVISION</text>
+<text x="40" y="831" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#182B2B">Restore earlier state; retain every revision.</text>
+<rect x="40" y="871" width="600" height="65" rx="12" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="62" y="913" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#007E70">R1</text>
+<text x="145" y="913" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Earlier accepted state</text>
+<polyline points="82,938 82,947" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="76,937 88,937 82,947" fill="#007E70"/>
+<rect x="40" y="951" width="600" height="65" rx="12" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="62" y="993" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#007E70">R2</text>
+<text x="145" y="993" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Later accepted state</text>
+<polyline points="82,1018 82,1027" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="76,1017 88,1017 82,1027" fill="#007E70"/>
+<rect x="40" y="1031" width="600" height="65" rx="12" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="62" y="1073" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#007E70">R3</text>
+<text x="145" y="1073" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Current before rollback</text>
+<polyline points="82,1098 82,1107" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="76,1097 88,1097 82,1107" fill="#007E70"/>
+<rect x="40" y="1111" width="600" height="65" rx="12" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="62" y="1153" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#007E70">R4</text>
+<text x="145" y="1153" font-family="DejaVu Sans" font-size="25" font-weight="bold" text-anchor="start" fill="#182B2B">Restored state from R1</text>
+<text x="40" y="1220" font-family="DejaVu Sans" font-size="22" font-weight="normal" text-anchor="start" fill="#4C6060">R4 follows R3. R1, R2 and R3 remain in history.</text>
+<text x="40" y="1252" font-family="DejaVu Sans" font-size="20" font-weight="normal" text-anchor="start" fill="#4C6060">Revision numbers here are illustrative.</text>
+</svg>

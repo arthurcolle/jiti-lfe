@@ -76,6 +76,13 @@ class ResumeTests(unittest.TestCase):
             audio.generate(self.job, client, self.output, "ffmpeg", "ffprobe")
         self.assertEqual(client.requests, 1)
 
+
+    def test_long_narration_is_rejected_instead_of_truncated(self):
+        with patch.object(audio, "duration", return_value=14.0), patch.object(audio, "run") as converter:
+            with self.assertRaisesRegex(audio.AudioError, ">1.3x"):
+                audio.normalize(Path("raw.wav"), Path("out.wav"), 10, "ffmpeg", "ffprobe", True)
+        converter.assert_not_called()
+
     def test_invalid_identifier_cannot_escape_audio_directory(self):
         self.job["id"] = "../../bad"
         with self.assertRaisesRegex(audio.AudioError, "Unsafe"):

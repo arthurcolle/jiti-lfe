@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1450" viewBox="0 0 680 1450" role="img" aria-labelledby="title desc">
+<title id="title">Repair a helper while its caller is paused</title>
+<desc id="desc">Generic labels describe the scripted live repair demonstration. A worker enters application function version 1 and increments its entry count to 1. A helper fails; the original frame and restart remain live. The controller requests repaired helper and replacement function definitions. The same worker evaluates both while paused. The controller then requests the live restart. The original version 1 frame completes with entry count 1; the next invocation enters version 2 and increments the count to 2. Original evaluation and repairs share one transaction.</desc>
+<rect width="680" height="1450" fill="#FAFAF7"/>
+<text x="40" y="49" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">03  /  A LIVING LISP APPLICATION</text>
+<text x="40" y="100" font-family="DejaVu Sans" font-size="34" font-weight="bold" text-anchor="start" fill="#182B2B">Keep the call. Repair the code.</text>
+<text x="40" y="140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">A live restart, illustrated by the scripted demo.</text>
+<rect x="40" y="178" width="600" height="138" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="214" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">WORKER · ENTER FUNCTION v1</text>
+<text x="64" y="256" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Original call begins.</text>
+<text x="64" y="291" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Entry count becomes 1.</text>
+<polyline points="340,324 340,346" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,336 346,336 340,346" fill="#007E70"/>
+<rect x="40" y="354" width="600" height="152" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="390" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">WORKER · PAUSED ON A CONDITION</text>
+<text x="64" y="432" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">A helper fails.</text>
+<text x="64" y="467" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Original frame + restart stay live.</text>
+<polyline points="340,514 340,536" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,526 346,526 340,536" fill="#007E70"/>
+<rect x="40" y="544" width="600" height="132" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="580" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">CONTROLLER → WORKER</text>
+<text x="64" y="622" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Define the repaired helper</text>
+<text x="64" y="657" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">and replacement function v2.</text>
+<polyline points="340,684 340,706" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,696 346,696 340,706" fill="#007E70"/>
+<rect x="40" y="714" width="600" height="132" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="750" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">WORKER · STILL IN THE SAME PAUSE</text>
+<text x="64" y="792" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Evaluate both new definitions.</text>
+<text x="64" y="827" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">The original v1 frame remains.</text>
+<polyline points="340,854 340,876" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,866 346,866 340,876" fill="#007E70"/>
+<rect x="40" y="884" width="600" height="104" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="920" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">CONTROLLER → WORKER</text>
+<text x="64" y="962" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Invoke the live restart.</text>
+<polyline points="340,996 340,1018" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,1008 346,1008 340,1018" fill="#007E70"/>
+<rect x="40" y="1026" width="600" height="136" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="1062" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">WORKER · ORIGINAL CALL COMPLETES</text>
+<text x="64" y="1104" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#182B2B">v1-active-frame</text>
+<text x="64" y="1139" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Entry count: 1</text>
+<polyline points="340,1170 340,1220" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="7 7"/>
+<polygon points="334,1210 346,1210 340,1220" fill="#007E70"/>
+<rect x="40" y="1228" width="600" height="124" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="1264" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">WORKER · NEXT INVOCATION</text>
+<text x="64" y="1306" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#182B2B">v2-new-frame</text>
+<text x="64" y="1341" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Entry count: 2</text>
+<text x="40" y="1392" font-family="DejaVu Sans" font-size="22" font-weight="normal" text-anchor="start" fill="#4C6060">Original evaluation + repairs = one transaction</text>
+<text x="40" y="1429" font-family="DejaVu Sans" font-size="23" font-weight="normal" text-anchor="start" fill="#4C6060">An active frame keeps its original body.</text>
+</svg>

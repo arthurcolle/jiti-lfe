@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "diagrams": [
+    {
+      "id": "01-conversation-and-lisp",
+      "svg": "launch/kernel-diagrams/01-conversation-and-lisp.svg",
+      "png": "artifacts/launch/kernel-diagrams/01-conversation-and-lisp.png",
+      "width": 1360,
+      "height": 2560,
+      "alt": "A request to add a capability goes to an external language model with instructions, registered tool descriptions and observed application state. The model requests a tool call. The controller validates and routes it to the persistent worker, which evaluates Lisp in the running application. Actual values, checks or a live pause return through the controller to inform the next model step. Accepted definitions and managed data remain available for later requests. Ordinary Lisp function calls do not require inference.",
+      "key": "conversation",
+      "mobile_png": "artifacts/launch/kernel-diagrams/01-conversation-and-lisp-mobile.png",
+      "caption": "The language model uses registered tools to inspect and change a running Lisp application. Actual worker results inform its next step; accepted functions and managed data remain available for later requests. Once defined, functions execute as ordinary Lisp."
+    },
+    {
+      "id": "02-kernel-ownership",
+      "svg": "launch/kernel-diagrams/02-kernel-ownership.svg",
+      "png": "artifacts/launch/kernel-diagrams/02-kernel-ownership.png",
+      "width": 1360,
+      "height": 2820,
+      "alt": "The controller validates tool arguments and sends actions one at a time to a persistent worker, receiving observations and results in return. The worker owns evaluation, the live stack and active restarts. Inside that worker, the world adapter provides managed code and data, the function catalogue, checkpoint and restore, and durable export and import. Caller-supplied safety checks and goals are assessed at safe points. Safety determines whether a candidate may be kept; goals determine completion. Accepted managed changes publish durable revisions. The reference adapter covers named functions and readable table data.",
+      "key": "composition",
+      "mobile_png": "artifacts/launch/kernel-diagrams/02-kernel-ownership-mobile.png",
+      "caption": "The controller routes actions; the persistent worker owns evaluation and live restarts. Its world adapter defines the managed resources, catalogue and recovery hooks. Caller safety checks govern acceptance while goals describe completion. Accepted managed changes become durable revisions."
+    },
+    {
+      "id": "03-paused-function-repair",
+      "svg": "launch/kernel-diagrams/03-paused-function-repair.svg",
+      "png": "artifacts/launch/kernel-diagrams/03-paused-function-repair.png",
+      "width": 1360,
+      "height": 2900,
+      "alt": "Generic labels describe the scripted live repair demonstration. A worker enters application function version 1 and increments its entry count to 1. A helper fails; the original frame and restart remain live. The controller requests repaired helper and replacement function definitions. The same worker evaluates both while paused. The controller then requests the live restart. The original version 1 frame completes with entry count 1; the next invocation enters version 2 and increments the count to 2. Original evaluation and repairs share one transaction.",
+      "key": "repair",
+      "mobile_png": "artifacts/launch/kernel-diagrams/03-paused-function-repair-mobile.png",
+      "caption": "The scripted capture demonstrates this protocol; function labels are generalized here. The worker evaluates repairs while retaining the original call and its live restart. Retrying the repaired helper completes the original frame. The replacement top-level function body is used by the next invocation."
+    },
+    {
+      "id": "04-recovery-and-history",
+      "svg": "launch/kernel-diagrams/04-recovery-and-history.svg",
+      "png": "artifacts/launch/kernel-diagrams/04-recovery-and-history.png",
+      "width": 1360,
+      "height": 2528,
+      "alt": "Accepted managed function definitions and data are saved as durable revisions. A fresh process imports the accepted revision; recovered functions are callable with their saved data. Live call stacks and chat memory are not part of this recovery. The rollback example preserves revisions 1, 2 and 3, then publishes revision 4 containing the managed state from revision 1. Revision 4 follows revision 3 in history, preserving intervening accepted states. Revision numbers are illustrative.",
+      "key": "persistence",
+      "mobile_png": "artifacts/launch/kernel-diagrams/04-recovery-and-history-mobile.png",
+      "caption": "Recovery imports accepted managed code and data into a fresh process; it does not resume an old stack or restore model conversation memory. Explicit rollback publishes an earlier managed state as a new revision, preserving intervening history."
+    }
+  ]
+}

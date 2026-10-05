@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1280" viewBox="0 0 680 1280" role="img" aria-labelledby="title desc">
+<title id="title">Conversation changes the running application</title>
+<desc id="desc">A request to add a capability goes to an external language model with instructions, registered tool descriptions and observed application state. The model requests a tool call. The controller validates and routes it to the persistent worker, which evaluates Lisp in the running application. Actual values, checks or a live pause return through the controller to inform the next model step. Accepted definitions and managed data remain available for later requests. Ordinary Lisp function calls do not require inference.</desc>
+<rect width="680" height="1280" fill="#FAFAF7"/>
+<text x="40" y="49" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">01  /  A LIVING LISP APPLICATION</text>
+<text x="40" y="100" font-family="DejaVu Sans" font-size="34" font-weight="bold" text-anchor="start" fill="#182B2B">Chat becomes running code.</text>
+<text x="40" y="140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">The model proposes. The Lisp image executes.</text>
+<rect x="40" y="178" width="600" height="104" rx="15" fill="#E5F3EF" stroke="#E5F3EF" stroke-width="1.5"/>
+<text x="64" y="216" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">YOU · ASK FOR A CAPABILITY</text>
+<text x="64" y="255" font-family="DejaVu Sans" font-size="27" font-weight="normal" text-anchor="start" fill="#182B2B">“Add a function that does this.”</text>
+<polyline points="340,290 340,320" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,310 346,310 340,320" fill="#007E70"/>
+<rect x="40" y="328" width="600" height="158" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="367" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">MODEL SERVICE · OUTSIDE LISP</text>
+<text x="64" y="409" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Instructions + registered tools</text>
+<text x="64" y="449" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Observed state + conversation</text>
+<text x="40" y="523" font-family="DejaVu Sans" font-size="23" font-weight="normal" text-anchor="start" fill="#4C6060">Requests a registered tool call</text>
+<polyline points="340,535 340,557" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,547 346,547 340,557" fill="#007E70"/>
+<rect x="40" y="565" width="600" height="106" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="604" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">CONTROLLER</text>
+<text x="64" y="644" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Validate arguments. Route the action.</text>
+<polyline points="340,679 340,709" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,699 346,699 340,709" fill="#007E70"/>
+<rect x="40" y="717" width="600" height="167" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="756" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">PERSISTENT LISP WORKER</text>
+<text x="64" y="797" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Inspect, define, call or repair functions.</text>
+<text x="64" y="839" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Use the application&#x27;s existing state.</text>
+<polyline points="340,892 340,921" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,911 346,911 340,921" fill="#007E70"/>
+<rect x="40" y="929" width="600" height="117" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="968" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">ACTUAL RESULTS → CONTROLLER</text>
+<text x="64" y="1010" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Values, checks or a live pause</text>
+<polyline points="640,986 659,986 659,406 641,406" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="651,400 651,412 641,406" fill="#007E70"/>
+<text x="40" y="1094" font-family="DejaVu Sans" font-size="26" font-weight="bold" text-anchor="start" fill="#182B2B">Results guide the next model step.</text>
+<text x="40" y="1140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#182B2B">Accepted code + data stay in the application.</text>
+<text x="40" y="1182" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#182B2B">The next request builds on what exists.</text>
+<polyline points="40,1210 640,1210" fill="none" stroke="#C9D5D1" stroke-width="1.5" stroke-linejoin="round"/>
+<text x="40" y="1251" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">Ordinary Lisp calls do not require inference.</text>
+</svg>

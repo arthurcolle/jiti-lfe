@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "diagrams": [
+    {
+      "id": "01-growing-application",
+      "svg": "launch/diagrams/01-growing-application.svg",
+      "png": "artifacts/launch/diagrams/01-growing-application.png",
+      "width": 1360,
+      "height": 2340,
+      "alt": "Four requests grow one running Lisp application. It starts with no expense functions. Record an expense adds add-expense; total my spending adds total-expenses; group by category adds spending-by-category; make a budget report adds budget-report. Each stage keeps the earlier functions.",
+      "caption": "The application starts with an empty expense ledger and no expense functions. Four chat stages add real Lisp definitions to the same running application; each new capability joins the existing catalogue."
+    },
+    {
+      "id": "02-function-composition",
+      "svg": "launch/diagrams/02-function-composition.svg",
+      "png": "artifacts/launch/diagrams/02-function-composition.png",
+      "width": 1360,
+      "height": 2110,
+      "alt": "One shared ledger contains coffee at $4.50, groceries at $32.00 and transport at $18.00. Both total-expenses and spending-by-category read that ledger. Their results feed budget-report with a $60 budget, returning $54.50 spent, $5.50 remaining and a category breakdown. Values are stored as integer cents.",
+      "caption": "The generated budget-report calls total-expenses and spending-by-category. Both read the existing ledger. The code stores integer cents; the diagram formats those amounts as dollars."
+    },
+    {
+      "id": "03-paused-call-repair",
+      "svg": "launch/diagrams/03-paused-call-repair.svg",
+      "png": "artifacts/launch/diagrams/03-paused-call-repair.png",
+      "width": 1360,
+      "height": 2880,
+      "alt": "Scripted repair demonstration. The worker enters render-budget-report version 1, then pauses when its category helper fails on transport. The original frame and retry-category restart remain live. The controller requests new helper and report definitions; the same worker evaluates the repairs while the original frame remains active. The controller asks to resume retry-category. The original call returns v1-active-frame with entry count 1. Only the next call enters v2-new-frame and increments the count to 2. The repair and original evaluation share a transaction.",
+      "caption": "In the scripted repair, the worker retains the original report frame and its active restart while accepting repair actions from the controller. Retrying the helper completes that original call; the replacement report body is used by the next call."
+    },
+    {
+      "id": "04-recovery-and-rollback",
+      "svg": "launch/diagrams/04-recovery-and-rollback.svg",
+      "png": "artifacts/launch/diagrams/04-recovery-and-rollback.png",
+      "width": 1360,
+      "height": 2484,
+      "alt": "Accepted managed function definitions and data are saved as revisions. A fresh process loads an accepted revision and can call those functions with their saved data; live stacks are not saved. The rollback example preserves revisions 1, 2 and 3, then publishes revision 4 containing the managed state from revision 1. Revision 4 follows revision 3 in history, so intermediate accepted revisions remain available. Revision numbers shown are illustrative.",
+      "caption": "Recovery restores accepted managed code and data into a fresh process, not a suspended stack. A rollback publishes the earlier state as a new revision after the current one, preserving all intervening accepted history."
+    }
+  ]
+}

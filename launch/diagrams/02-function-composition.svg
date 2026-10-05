@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1055" viewBox="0 0 680 1055" role="img" aria-labelledby="title desc">
+<title id="title">New functions reuse earlier ones</title>
+<desc id="desc">One shared ledger contains coffee at $4.50, groceries at $32.00 and transport at $18.00. Both total-expenses and spending-by-category read that ledger. Their results feed budget-report with a $60 budget, returning $54.50 spent, $5.50 remaining and a category breakdown. Values are stored as integer cents.</desc>
+<rect width="680" height="1055" fill="#FAFAF7"/>
+<text x="40" y="49" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">02  /  A LIVING LISP APPLICATION</text>
+<text x="40" y="100" font-family="DejaVu Sans" font-size="34" font-weight="bold" text-anchor="start" fill="#182B2B">New capability. Same pieces.</text>
+<text x="40" y="140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">Ordinary Lisp function composition.</text>
+<rect x="40" y="177" width="600" height="180" rx="15" fill="#E5F3EF" stroke="#E5F3EF" stroke-width="1.5"/>
+<text x="64" y="217" font-family="DejaVu Sans" font-size="22" font-weight="bold" text-anchor="start" fill="#007E70">ONE SHARED LEDGER</text>
+<text x="64" y="258" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Coffee</text>
+<text x="478" y="258" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">$4.50</text>
+<text x="64" y="293" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Groceries</text>
+<text x="478" y="293" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">$32.00</text>
+<text x="64" y="328" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Transport</text>
+<text x="478" y="328" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">$18.00</text>
+<polyline points="88,357 88,616" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polyline points="88,468 140,468" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="130,462 130,474 140,468" fill="#007E70"/>
+<polyline points="88,616 140,616" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="130,610 130,622 140,616" fill="#007E70"/>
+<rect x="140" y="410" width="500" height="116" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="164" y="452" font-family="DejaVu Sans Mono" font-size="28" font-weight="bold" text-anchor="start" fill="#007E70">total-expenses</text>
+<text x="164" y="494" font-family="DejaVu Sans" font-size="26" font-weight="normal" text-anchor="start" fill="#182B2B">Returns 5450 cents</text>
+<rect x="140" y="558" width="500" height="116" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="164" y="600" font-family="DejaVu Sans Mono" font-size="25" font-weight="bold" text-anchor="start" fill="#007E70">spending-by-category</text>
+<text x="164" y="642" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#182B2B">Returns the category totals</text>
+<polyline points="640,468 659,468 659,727 340,727 340,762" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,752 346,752 340,762" fill="#007E70"/>
+<polyline points="640,616 659,616" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<text x="140" y="707" font-family="DejaVu Sans" font-size="22" font-weight="normal" text-anchor="start" fill="#4C6060">Both results feed the report</text>
+<rect x="40" y="770" width="600" height="220" rx="15" fill="#E5F3EF" stroke="#007E70" stroke-width="1.5"/>
+<text x="64" y="813" font-family="DejaVu Sans Mono" font-size="28" font-weight="bold" text-anchor="start" fill="#007E70">(budget-report 6000)</text>
+<text x="64" y="857" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#4C6060">Budget</text>
+<text x="424" y="857" font-family="DejaVu Sans" font-size="29" font-weight="bold" text-anchor="start" fill="#182B2B">$60.00</text>
+<text x="64" y="900" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#4C6060">Spent</text>
+<text x="424" y="900" font-family="DejaVu Sans" font-size="29" font-weight="bold" text-anchor="start" fill="#182B2B">$54.50</text>
+<text x="64" y="943" font-family="DejaVu Sans" font-size="25" font-weight="normal" text-anchor="start" fill="#4C6060">Remaining</text>
+<text x="424" y="943" font-family="DejaVu Sans" font-size="29" font-weight="bold" text-anchor="start" fill="#007E70">$5.50</text>
+<text x="40" y="1030" font-family="DejaVu Sans" font-size="22" font-weight="normal" text-anchor="start" fill="#4C6060">The report also includes the category breakdown.</text>
+</svg>

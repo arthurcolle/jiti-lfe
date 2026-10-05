@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1170" viewBox="0 0 680 1170" role="img" aria-labelledby="title desc">
+<title id="title">An application grows by conversation</title>
+<desc id="desc">Four requests grow one running Lisp application. It starts with no expense functions. Record an expense adds add-expense; total my spending adds total-expenses; group by category adds spending-by-category; make a budget report adds budget-report. Each stage keeps the earlier functions.</desc>
+<rect width="680" height="1170" fill="#FAFAF7"/>
+<text x="40" y="49" font-family="DejaVu Sans" font-size="20" font-weight="bold" text-anchor="start" fill="#007E70">01  /  A LIVING LISP APPLICATION</text>
+<text x="40" y="100" font-family="DejaVu Sans" font-size="34" font-weight="bold" text-anchor="start" fill="#182B2B">Ask. Add. Keep building.</text>
+<text x="40" y="140" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#4C6060">Four requests, one running application.</text>
+<rect x="40" y="176" width="600" height="86" rx="15" fill="#E5F3EF" stroke="#E5F3EF" stroke-width="1.5"/>
+<text x="64" y="212" font-family="DejaVu Sans" font-size="21" font-weight="bold" text-anchor="start" fill="#007E70">START: NO EXPENSE FUNCTIONS</text>
+<text x="64" y="245" font-family="DejaVu Sans" font-size="24" font-weight="normal" text-anchor="start" fill="#182B2B">The runtime and an empty ledger exist.</text>
+<polyline points="340,270 340,290" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,280 346,280 340,290" fill="#007E70"/>
+<rect x="40" y="298" width="600" height="112" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="337" font-family="DejaVu Sans" font-size="28" font-weight="bold" text-anchor="start" fill="#182B2B">1.  Record an expense</text>
+<text x="80" y="377" font-family="DejaVu Sans Mono" font-size="26" font-weight="bold" text-anchor="start" fill="#007E70">+ add-expense</text>
+<polyline points="340,418 340,438" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,428 346,428 340,438" fill="#007E70"/>
+<rect x="40" y="446" width="600" height="146" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="485" font-family="DejaVu Sans" font-size="28" font-weight="bold" text-anchor="start" fill="#182B2B">2.  Total my spending</text>
+<text x="80" y="525" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#4C6060">  add-expense</text>
+<text x="80" y="559" font-family="DejaVu Sans Mono" font-size="26" font-weight="bold" text-anchor="start" fill="#007E70">+ total-expenses</text>
+<polyline points="340,600 340,620" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,610 346,610 340,620" fill="#007E70"/>
+<rect x="40" y="628" width="600" height="180" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="667" font-family="DejaVu Sans" font-size="28" font-weight="bold" text-anchor="start" fill="#182B2B">3.  Group by category</text>
+<text x="80" y="707" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#4C6060">  add-expense</text>
+<text x="80" y="741" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#4C6060">  total-expenses</text>
+<text x="80" y="775" font-family="DejaVu Sans Mono" font-size="26" font-weight="bold" text-anchor="start" fill="#007E70">+ spending-by-category</text>
+<polyline points="340,816 340,836" fill="none" stroke="#007E70" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="334,826 346,826 340,836" fill="#007E70"/>
+<rect x="40" y="844" width="600" height="214" rx="15" fill="#FFFFFF" stroke="#C9D5D1" stroke-width="1.5"/>
+<text x="64" y="883" font-family="DejaVu Sans" font-size="28" font-weight="bold" text-anchor="start" fill="#182B2B">4.  Make a budget report</text>
+<text x="80" y="923" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#4C6060">  add-expense</text>
+<text x="80" y="957" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#4C6060">  total-expenses</text>
+<text x="80" y="991" font-family="DejaVu Sans Mono" font-size="26" font-weight="normal" text-anchor="start" fill="#4C6060">  spending-by-category</text>
+<text x="80" y="1025" font-family="DejaVu Sans Mono" font-size="26" font-weight="bold" text-anchor="start" fill="#007E70">+ budget-report</text>
+<text x="40" y="1111" font-family="DejaVu Sans" font-size="26" font-weight="bold" text-anchor="start" fill="#182B2B">Earlier capabilities remain available.</text>
+<text x="40" y="1148" font-family="DejaVu Sans" font-size="22" font-weight="normal" text-anchor="start" fill="#4C6060">Request wording is condensed from the live run.</text>
+</svg>
