@@ -24,6 +24,9 @@ devenv.local.yaml
 .image-agent/
 *.fasl
 __pycache__/
+_build/
+.jiti/
+erl_crash.dump
 
 # Rebuildable launch media (sources and scripts live in launch/).
 artifacts/launch/

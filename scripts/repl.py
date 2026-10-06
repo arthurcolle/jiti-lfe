@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
-"""Start the live application with terminal editing or a plain pipe interface."""
+"""Start the SBCL application, or explicitly select the experimental LFE backend."""
 import os
 from pathlib import Path
 import sys
-from local_openai import configure
 
-configure()
-arguments = sys.argv[1:]
-plain = '--plain' in arguments
-emoji = '--no-emoji' not in arguments
-arguments = [argument for argument in arguments if argument not in ('--plain', '--no-emoji')]
-interactive = sys.stdin.isatty() and sys.stdout.isatty() and os.environ.get('TERM') != 'dumb'
-if plain or not interactive or '--help' in arguments:
-    loader = Path(__file__).resolve().with_name('repl.lisp')
-    os.execvp('sbcl', ['sbcl', '--noinform', '--script', str(loader), *arguments])
-else:
-    from terminal_ui import main
-    sys.exit(main(arguments, emoji=emoji))
+sys.dont_write_bytecode = True
+if __name__ == '__main__':
+    arguments = sys.argv[1:]
+    if '--lfe' not in arguments:
+        if '--legacy' in arguments:
+            arguments.remove('--legacy')
+        legacy = Path(__file__).resolve().with_name('legacy_repl.py')
+        os.execv(sys.executable, [sys.executable, '-B', str(legacy), *arguments])
+    arguments.remove('--lfe')
+    from lfe_repl import main
+    sys.exit(main(arguments))

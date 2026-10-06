@@ -2,6 +2,49 @@
 
 **Grow a running Lisp application by talking to it.**
 
+The default backend remains SBCL. An experimental LFE backend now has its own
+build and verification path:
+
+```sh
+make           # fetch/build pinned LFE 2.2.2 and compile the BEAM modules
+make test      # actual BEAM scenarios, generated state-machine checks, ADRs
+make repl      # start the LFE terminal
+python3 scripts/repl.py --lfe --eval '(+ 2 3)'  # returns 5
+```
+
+These commands require Erlang/OTP 27 or later, Git, Make, Bash and Python 3 on
+PATH; the current implementation was verified on OTP 29. `devenv shell -- lfe-repl`
+supplies the development environment. LFE uses its own `.jiti/default` store and
+retries failed actions after explicit repair. Its semantics and current gaps are
+documented in [the LFE backend guide](docs/lfe-conversion.md); SBCL retains live
+restart repair. `make test-kernel` runs the original SBCL test command.
+
+The LFE terminal now supports `/functions [OFFSET]`, `/describe NAME ARITY`, and
+`/operations`. Function documentation and normalized source follow managed
+revisions; source-free operation summaries survive a fresh process and diagnose
+interrupted attempts without replaying them.
+
+For normal LFE chat, run `python3 scripts/repl.py --lfe --mode chat`. Chat has native
+tools to build a complete dependency plan, launch ready jobs, reconcile execution
+receipts, verify stored checks, and block or cancel work. `/plans` discovers saved
+plans after reopening, and `/plan ID` shows their frontier and results. Model
+output defaults to 8192 tokens per request; `--max-output-tokens 16384` permits
+larger definitions. See [the planning-tool guide](docs/lfe-conversion.md#native-chat-planning).
+
+Chat also has 31 new typed tools for state edits, function definition/calls/tests,
+owned jobs, durable working notes, workspace search, and tool discovery. Managed
+edits use revision checks and previews; notes and accepted job receipts survive
+reopening. See [the toolkit guide](docs/lfe-conversion.md#expanded-native-toolkit)
+for examples and the difference between recorded results and current observations.
+
+`/plan ID` inspects durable task/group graphs and their complete ready frontier.
+Explicit launch, independent checks, owned asynchronous jobs and fenced
+agents.erl identities are documented in the
+[farm verification receipt](docs/lfe-farm-verification-2026-10-06.md).
+The [six-tool-bundle experiment](scripts/farm_rollouts.py) compares actual model
+proposals on common held-out jobs and allocates a separate descendant trial from
+observed outcomes. It does not prescribe agent roles or promote runtime defaults.
+
 Jiti is a cooperative kernel for developing and using a live Common Lisp application through chat. Ask for a function, try it against the application's data, then ask for another capability that builds on it. Accepted definitions remain available to later requests and can be recovered in a fresh process.
 
 Application behaviour comes from the Lisp you add and the resources your world adapter supports. You can start with an empty function catalogue or extend an existing application. The same interface lets you inspect definitions, execute expressions, preview changes, and repair a paused call.

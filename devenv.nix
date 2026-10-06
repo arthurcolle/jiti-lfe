@@ -3,7 +3,9 @@ let
   lisp = pkgs.sbcl.withPackages (p: [ p.check-it p.fiveam p.dexador p.yason ]);
   python = pkgs.python3.withPackages (p: [ p.pyyaml p.prompt-toolkit p.rich p.pillow p.numpy ]);
 in {
-  packages = [ pkgs.git lisp python pkgs.coreutils pkgs.ffmpeg pkgs.dejavu_fonts ];
+  packages = [ pkgs.git lisp python pkgs.erlang pkgs.gnumake pkgs.coreutils pkgs.ffmpeg pkgs.dejavu_fonts ];
+  scripts.lfe-repl.exec = ''make build && python3 scripts/repl.py --lfe "$@"'';
+  scripts.test-lfe.exec = "make test";
   scripts.experiment-reverse.exec = ''python3 scripts/experiment.py "$@"'';
   scripts.image-repl.exec = ''python3 scripts/repl.py "$@"'';
   scripts.test.exec = "bash scripts/run-tests.sh test";
