@@ -1,9 +1,12 @@
 # Repository instructions
 
-Repository reference: [arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
-When prior implementation context is needed, inspect its source, README and
-commit history. This checkout's `fork` remote points to that repository;
-`origin` points to [upstream Jiti](https://github.com/ghuntley/jiti).
+Original upstream repository: [ghuntley/jiti](https://github.com/ghuntley/jiti),
+created by Geoffrey Huntley. For the original implementation and design context,
+inspect that repository's source, README and commit history. Distinguish its
+SBCL live restart semantics from this fork's LFE whole-action retry semantics.
+
+This fork is [arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
+The `origin` remote points to `ghuntley/jiti`; `fork` points to `arthurcolle/jiti-lfe`.
 
 This fork runs the LFE backend by default and retains the cooperative live SBCL
 image-repair kernel behind `--legacy`. Preserve SBCL active restart dynamic

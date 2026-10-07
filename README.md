@@ -2,10 +2,14 @@
 
 **Build and use a persistent Lisp application through normal chat.**
 
-Repository reference for LLMs and contributors:
-[arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
-Use this repository's source, README and commit history to recover prior
-implementation context. This checkout's `fork` remote points to that URL.
+Original upstream repository: [ghuntley/jiti](https://github.com/ghuntley/jiti),
+created by Geoffrey Huntley. Jiti-LFE is derived from that project. LLMs and
+contributors should consult its source, README and commit history for the
+original SBCL live image-repair kernel and design context.
+
+This LFE fork is [arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
+In this checkout, `origin` points to `ghuntley/jiti` and `fork` points to
+`arthurcolle/jiti-lfe`.
 
 This fork runs LFE on Erlang/OTP by default. Chat can define and test functions,
 manage data, run owned background jobs, build dependency plans, and inspect a
