@@ -181,7 +181,7 @@ def pagination(base):
         assert first['plan_count'] == 53 and b.revision == 1
         assert tool(c, 'plan_list', offset=1000)['plans'] == []
         assert b.request('plan_list', offset=-1)['status'] == 'rejected'
-        output = SimpleNamespace(result=lambda r: None, text=lambda text: None)
+        output = SimpleNamespace(result=lambda r, **kwargs: None, text=lambda text: None)
         session = Session(b, output, SimpleNamespace(mode='lfe'))
         assert session.run('/plans 50')
         try:

@@ -1,6 +1,6 @@
 ;;;; Typed convenience operations share the managed candidate and job owner.
 ;;;; Data is decoded as JSON, never interpolated into executable source.
-(defmodule jiti_toolkit (export (apply 2) (inspect 3)))
+(defmodule jiti_toolkit (export (apply 2) (inspect 3) (value-view 1)))
 
 (defun arg (args key) (map-get args key))
 (defun snapshot () (get 'jiti_candidate))
@@ -47,7 +47,8 @@
 (defun printed-list
   ((() _) 'true)
   (((cons first rest) depth)
-   (andalso (> depth 0) (printed-complete first depth) (printed-list rest (- depth 1)))))
+   (andalso (> depth 0) (printed-complete first depth) (printed-list rest (- depth 1))))
+  ((_ _) 'false))
 (defun printed-map
   ((() _) 'true)
   (((cons (tuple k v) rest) depth)
@@ -60,12 +61,35 @@
     ((is_tuple value) (printed-list (tuple_to_list value) (- depth 1)))
     ((is_map value) (printed-map (maps:to_list value) depth))
     ('true 'true)))
+(defun display-list
+  ((() _) 'true)
+  (((cons first rest) depth)
+   (andalso (> depth 0) (display-complete first depth) (display-list rest (- depth 1))))
+  ((_ _) 'false))
+(defun display-complete (value depth)
+  (cond
+    ((=< depth 0) 'false)
+    ((is_binary value)
+     (let ((chars (unicode:characters_to_list value)))
+       (orelse (andalso (is_list chars) (io_lib:printable_unicode_list chars))
+               (=< (byte_size value) depth))))
+    ((is_list value)
+     (orelse (io_lib:printable_unicode_list value) (display-list value (- depth 1))))
+    ((is_tuple value) (display-list (tuple_to_list value) (- depth 1)))
+    ((is_map value)
+     (lists:all (lambda (entry)
+       (andalso (display-complete (element 1 entry) (- depth 1))
+                (display-complete (element 2 entry) (- depth 1)))) (maps:to_list value)))
+    ('true 'true)))
 (defun value-view (value)
   (let* ((printed (limited (unicode:characters_to_binary (lfe_io:print1 value 15)) 4096))
+         (display (limited (unicode:characters_to_binary (lfe_io:prettyprint1 value 40 0 88)) 16000))
          (encoded (try
            (progn (bounded-value value) (iolist_to_binary (json:encode value)))
            (catch ((tuple _ _ _) 'unavailable)))))
     (map 'value_lfe (map-get printed 'text)
+         'value_display (map-get display 'text)
+         'display_truncated (orelse (map-get display 'truncated) (not (display-complete value 40)))
          'value_truncated (orelse (map-get printed 'truncated) (not (printed-complete value 15)))
          'json_available (/= encoded 'unavailable)
          'value_json (if (=:= encoded 'unavailable) 'null encoded))))

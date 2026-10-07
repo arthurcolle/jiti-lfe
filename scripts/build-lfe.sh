@@ -44,7 +44,7 @@ sources=("$ROOT"/src/*.lfe)
 export ERL_LIBS="$LFE_ROOT${ERL_LIBS:+:$ERL_LIBS}"
 "$LFE_ROOT/bin/lfec" -pa "$LFE_EBIN" -o "$EBIN" "${sources[@]}"
 
-for required in jiti_bridge jiti_kernel jiti_toolkit jiti_store jiti_operations jiti_catalogue jiti_workspace jiti_workspace_state jiti_workspace_project jiti_runtime jiti_processes jiti_plan; do
+for required in jiti_bridge jiti_kernel jiti_dispatch jiti_toolkit jiti_store jiti_operations jiti_catalogue jiti_workspace jiti_workspace_state jiti_workspace_project jiti_runtime jiti_processes jiti_plan; do
   [ -f "$EBIN/$required.beam" ] || fail "required kernel module missing: $EBIN/$required.beam"
 done
 touch "$EBIN/.build-ok"

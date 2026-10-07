@@ -46,6 +46,46 @@ devenv shell test-lfe
 terminal input is collected until balanced, then parsed by the actual LFE reader.
 Rebuild after editing `.lfe` files; the frontend rejects stale/incomplete builds.
 
+## Inspect the application
+
+Routine commands show their result and revision. They no longer dump all managed
+state. Start with `/status` for capability counts and any pending repair, then use
+the appropriate inspection:
+
+```text
+/state                    List ordinary keys with short value previews
+/state diagnosis          Read one atom-keyed value
+/state last-invoice binary Read a binary-keyed value
+/functions                Discover managed functions
+/describe invoice-total 1 Inspect a function's source and callers
+/plans                    List saved plans; /plan ID shows dependencies and checks
+/jobs                     List job receipts; /job ID shows recorded/current status
+/notes                    List saved notes; /note ID reads one
+/help                     Quick command guide; /help all lists advanced controls
+/exit                     Close; /quit and /q also work
+```
+
+`/state-list OFFSET`, `/functions OFFSET`, `/plans OFFSET`, `/jobs OFFSET`, and
+`/notes OFFSET` continue paginated inspection. Tuple-keyed internal records belong
+to the plans/jobs/notes interfaces, not ordinary state lookup. Inspections do not
+create revisions or resume work. `/details` shows the last received raw bridge
+receipt without issuing a new operation; `--json` keeps raw JSON output.
+
+Returned values use a native bounded LFE pretty view. A printable integer list
+may appear in string notation; its stored type is unchanged. Display shortening
+and native depth/size bounds are explicit. Inspect a specific field when necessary.
+An `ok` receipt says the operation ran; a returned `blocked` diagnosis still needs
+resolution. Goal outcomes are shown for evaluated actions with goal predicates,
+and remain separate from safety checks.
+
+Chat receives operation receipts and targeted observations rather than a repeated
+whole-state dump. Successful tools show one activity line and chat explains their
+outcomes; errors and pending repairs show their details immediately. Chat
+automatically compacts at its configured threshold; `/context`
+shows the budget, `/compact` compacts now, and `/recall QUERY` searches archived
+excerpts. Compaction is local and lossy. `/clear` clears conversation context while
+preserving the application and pending repair. See [ADR 0029](adr/0029-targeted-cli-observations.md).
+
 ## Native chat planning
 
 ```sh

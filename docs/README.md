@@ -3,6 +3,7 @@
 | Guide | Purpose |
 |---|---|
 | [LFE backend](lfe-conversion.md) | Evaluation, repair, persistence, chat and typed tools. |
+| [Runnable examples](../examples/README.md) | Invoice audit, verified release gate and reservation repair built for this fork. |
 | [Project workspace](workspace.md) | Saved projects, code maps, pins and source baselines. |
 | [Workspace contracts](workspace-contract.md) | Contract diff, compatibility and adversarial cases. |
 | [Toolkit contracts](lfe-toolkit-contract.md) | Existing managed data/function/job/notes tools. |

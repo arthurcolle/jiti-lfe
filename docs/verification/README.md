@@ -2,6 +2,7 @@
 
 | Report | Observed scope |
 |---|---|
+| [Developer interface, 2026-10-06](lfe-developer-interface-2026-10-06.md) | Targeted inspections, live polymorphic execution, terminal editor and numeric receipt display. |
 | [Workspace, 2026-10-06](lfe-workspace-verification-2026-10-06.md) | Managed projects, source evidence, diff, real chat and restart recovery. |
 | [Toolkit, 2026-10-06](lfe-toolkit-verification-2026-10-06.md) | 31 added managed tools and bounded provider smoke. |
 | [Native plans, 2026-10-06](lfe-native-plans-verification-2026-10-06.md) | Real concurrent jobs, dependent join, checks and recovery. |

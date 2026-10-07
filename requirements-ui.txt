@@ -1,0 +1,3 @@
+# Presentation only; native application behavior stays in LFE.
+prompt-toolkit==3.0.53
+rich==15.0.0

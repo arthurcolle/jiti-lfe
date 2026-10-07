@@ -9,7 +9,11 @@
          (reply (map 'status (atom_to_binary status 'utf8)
                      'revision (map-get snapshot 'revision)
                      'state (text (map-get snapshot 'state))
-                     'value value 'reason reason 'goal goal)))
+                     'value value 'reason reason 'goal goal
+                     'summary (map 'state_keys (map_size (map-get snapshot 'state))
+                                   'functions (map_size (map-get snapshot 'definitions))
+                                   'goals (length (map-get (map-get controller 'contract) 'goals))
+                                   'safety_checks (length (map-get (map-get controller 'contract) 'safety))))))
     (case (map-get controller 'pending)
       ('none reply)
       (pending (map-set reply 'token (map-get pending 'token))))))
@@ -23,7 +27,8 @@
 (defun tool-response (reply value)
   ;; Typed details are nested. They cannot replace revision, goal or repair token.
   (if (andalso (is_map value) (maps:is_key #B("native_tool_result") value))
-      (map-set reply 'value #B() 'data (map-get value #B("native_tool_result"))) reply))
+      (map-set (maps:without '(value_display display_truncated json_available value_json) reply)
+               'value #B() 'data (map-get value #B("native_tool_result"))) reply))
 
 (defun publish (controller candidate)
   (let ((previous (map-get controller 'snapshot)))
@@ -50,7 +55,13 @@
                              (map-set (map-get controller 'pending) 'candidate candidate)))
                    (preview (map-set controller 'pending 'none))
                    ('true (publish (map-set controller 'pending 'none) candidate)))))
-       (tuple next (tool-response (response next 'ok (text value) #B() goal) value))))
+       (let ((view (jiti_toolkit:value-view value)))
+         (tuple next (tool-response
+           (map-set (response next 'ok (text value) #B() goal)
+                    'value_display (map-get view 'value_display)
+                    'display_truncated (map-get view 'display_truncated)
+                    'json_available (map-get view 'json_available)
+                    'value_json (map-get view 'value_json)) value)))))
     ((tuple 'rejected reason)
      ;; A failed repair aborts the whole provisional attempt.
      (let ((next (if repair (map-set controller 'pending 'none) controller)))

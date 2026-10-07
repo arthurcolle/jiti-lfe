@@ -95,7 +95,7 @@ def plan_tests(base):
         execute(b, '(length (jiti_processes:all))', '0')
     cli = subprocess.run([sys.executable, str(ROOT/'scripts/repl.py'), '--lfe', '--store', str(base/'plans'), '--plain'],
                          input='/plan demo\n/quit\n', text=True, capture_output=True, timeout=15)
-    assert cli.returncode == 0 and 'plan: demo' in cli.stdout and 'root group done' in cli.stdout, cli.stdout + cli.stderr
+    assert cli.returncode == 0 and 'plan: demo' in cli.stdout and 'root: done — Root' in cli.stdout, cli.stdout + cli.stderr
     with session(base / 'plans') as b:
         execute(b, '(=:= (map-get (map-get (map-get (jiti_plan:inspect #B("demo")) \'nodes) #B("root")) \'status) \'done)', 'true')
         execute(b, '(map-get (jiti_processes:inspect (state-get \'orphan)) \'status)', 'unknown')

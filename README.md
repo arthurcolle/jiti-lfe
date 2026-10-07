@@ -2,15 +2,6 @@
 
 **Build and use a persistent Lisp application through normal chat.**
 
-Original upstream repository: [ghuntley/jiti](https://github.com/ghuntley/jiti),
-created by Geoffrey Huntley. Jiti-LFE is derived from that project. LLMs and
-contributors should consult its source, README and commit history for the
-original SBCL live image-repair kernel and design context.
-
-This LFE fork is [arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
-In this checkout, `origin` points to `ghuntley/jiti` and `fork` points to
-`arthurcolle/jiti-lfe`.
-
 This fork runs LFE on Erlang/OTP by default. Chat can define and test functions,
 manage data, run owned background jobs, build dependency plans, and inspect a
 saved project workspace. Accepted code, data, notes, project pins and source
@@ -37,22 +28,37 @@ make chat
 service; explicit settings take precedence over discovered local configuration.
 `--model NAME` overrides model selection. Keep credentials outside this repo.
 
-Just type a request:
-
-```text
-Define invoice-total for rows containing quantity and price. Test an empty
-invoice and a three-row invoice, then save the verified result.
-
-Create two independent checks and a final task depending on both. Run the
-checks, inspect their receipts, and verify them before starting the final task.
-
-Open the jiti project, find the controller implementation, and pin it alongside
-its acceptance contract. Explain the relevant code using file and line evidence.
-```
-
 Chat exposes **69 native tools and 9 conversation-context tools**. Tools produce
 actual runtime observations; a model's completion statement is not acceptance.
 Use `/help` for terminal commands and `/tool-limit N` for the per-turn call limit.
+
+`make chat` installs the optional terminal editor into `.jiti/ui-venv`: formatted
+Markdown/code, multiline input, Tab command completion, Ctrl+R history and a live
+session bar. Tools stay quiet; `/activity` and `/details N` open their receipts.
+Use `/view verbose` for more output and `/model NAME` to change subsequent requests.
+`--plain` and `--json` keep the dependency-free automation interface.
+
+## Dynamic execution
+
+Build new capabilities in the live image: overloaded functions, multimethods,
+partial application, composition, map and fold, including dynamic Erlang calls
+such as `(map-call (tuple 'remote 'erlang 'abs) '(-3 4 -5))`.
+Stored named pipelines resolve
+the current implementation on every call, including after repair or restart.
+
+```lisp
+(defun double (x) (* x 2))
+(defun plus (a b) (+ a b))
+(method-put 'transform '(number) 'double)
+(state-put 'pipeline
+  (compose (list (tuple 'dispatch 'transform) (partial 'plus '(10)))))
+(map-call (state-get 'pipeline) '(2 3 4)) ; (14 16 18)
+```
+
+Tuple tags and JSON map type tags support domain-specific dispatch. Overlapping
+signatures must have a unique most specific match. Try the
+[polymorphic pricing example](examples/dynamic-dispatch.lfe); temporary lambdas
+can execute too, while durable state stores named descriptors.
 
 Manual LFE needs no model credentials:
 
@@ -64,6 +70,56 @@ python3 scripts/repl.py --eval '(+ 2 3)' --json
 The second command returns `5`. `--lfe` remains a compatible explicit selector.
 The default store is `.jiti/default`; `--store PATH` selects another. Rebuild after
 editing native `.lfe` files; the frontend rejects stale or incomplete builds.
+
+## Examples built for this fork
+
+These are runnable LFE programs with fixed acceptance checks, not sample
+conversations claiming a model did the work. Run them without credentials:
+
+```sh
+make examples
+```
+
+The runner creates temporary stores, executes the programs, checks recovery in
+fresh processes and removes its temporary data. See the
+[example guide](examples/README.md) to load them into your own persistent store.
+
+| Example | What it does | Checked result |
+|---|---|---|
+| [Invoice audit](examples/invoice-audit.lfe) | Validate line items, count each valid ID once and report rejected rows. | 32,400 cents; three accepted lines, one duplicate and one invalid line. |
+| [Release gate](examples/release-gate.lfe) | Launch two independent checks, inspect their receipts, then verify them before admitting the dependent release task. | Three verified tasks; fixture p95 is 100 ms; restart launches no replacement jobs. |
+| [Reservation repair](examples/reservation-repair.lfe) | Diagnose missing pricing after a provisional stock edit, repair and retry the whole action, then preview another reservation. | Stock goes from 20 to 16 once; price is 6,000 cents; preview changes are discarded. |
+| [Dynamic dispatch](examples/dynamic-dispatch.lfe) | Price heterogeneous inputs through multimethods, compose a fee, and fold the result. | 925 cents; stored descriptors follow live function replacement. |
+
+For chat, give it a concrete contract:
+
+```text
+Build an invoice audit using JSON-compatible rows with id, qty and unit_cents.
+Require positive integer quantities and nonnegative integer prices. Count each
+valid ID once. Use the five rows in examples/invoice-audit.lfe as fixtures:
+32,400 cents, three accepted lines, duplicate A-101 and invalid A-103. Test an
+empty invoice and a fractional price too. Save the report and show the receipts.
+```
+
+```text
+Create a release plan with independent receipt-schema and p95 checks, followed
+by a release decision that depends on both. Use examples/release-gate.lfe's
+fixed fixtures and acceptance checks. Launch both checks before waiting. Show
+that successful execution alone does not admit the release task; verify the
+checks, then run the dependent task. This should produce a local decision only.
+```
+
+```text
+Use examples/reservation-repair.lfe to define an inventory reservation with
+20 units. Try reserving four while pricing is missing. Inspect the failure,
+define pricing at 1,500 cents per unit, and retry the failed action. Verify
+stock is 16 and the price is 6,000 cents. Preview two more units and show that
+the accepted stock and price stay unchanged.
+```
+
+The invoice and duration records are synthetic fixtures. The release example
+produces a local decision; it does not deploy software. Its p95 is a calculation
+over supplied data, not a runtime performance measurement.
 
 ## A project workspace that survives restart
 
@@ -132,3 +188,13 @@ Read the [backend guide](docs/lfe-conversion.md), [workspace guide](docs/workspa
 and [architectural decisions](docs/adr/). Generated stores, worker transcripts,
 crash dumps and build outputs stay local. Retained reports and compact evidence
 have their own folders under `docs/`.
+
+## Origin
+
+Jiti-LFE builds on [Geoffrey Huntley's original Jiti](https://github.com/ghuntley/jiti).
+LLMs and contributors can consult that repository's source, README and commit
+history for the original SBCL kernel and design context. This fork's examples
+above exercise its LFE runtime and whole-action repair semantics.
+
+This fork is [arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
+The `origin` remote points to `ghuntley/jiti`; `fork` points to `arthurcolle/jiti-lfe`.
