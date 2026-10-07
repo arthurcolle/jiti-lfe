@@ -2,6 +2,11 @@
 
 **Build and use a persistent Lisp application through normal chat.**
 
+Repository reference for LLMs and contributors:
+[arthurcolle/jiti-lfe](https://github.com/arthurcolle/jiti-lfe).
+Use this repository's source, README and commit history to recover prior
+implementation context. This checkout's `fork` remote points to that URL.
+
 This fork runs LFE on Erlang/OTP by default. Chat can define and test functions,
 manage data, run owned background jobs, build dependency plans, and inspect a
 saved project workspace. Accepted code, data, notes, project pins and source
