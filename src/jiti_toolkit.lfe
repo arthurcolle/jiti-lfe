@@ -280,7 +280,7 @@
             (p (page found (arg args #B("offset")) 20 'notes)))
        (map-set p 'notes (lists:map (lambda (entry)
          (let (((tuple id note) entry)) (note-view id note 'false))) (map-get p 'notes)))))
-    (_ (error 'unknown_inspection))))
+    (_ (jiti_workspace_state:inspect s action args))))
 
 (defun dispatch (action args)
   (case action
@@ -333,7 +333,7 @@
     (#B("note_delete")
      (let* ((k (record-key 'chat-note args)) (found (maps:is_key k (state))))
        (jiti_kernel:state-delete k) (map 'deleted found)))
-    (_ (error 'unknown_native_tool))))
+    (_ (jiti_workspace_state:mutate action args))))
 
 (defun apply (action args)
   (let ((base (snapshot)))
@@ -355,5 +355,12 @@
          invalid_definition reserved_function empty_source invalid_source
          argument_array_required record_not_found invalid_job job_id_conflict
          job_start_rejected job_handle_unknown invalid_offset unknown_inspection
-         function_has_callers patch_limit case_limit note_limit unknown_native_tool))
+         function_has_callers patch_limit case_limit note_limit unknown_native_tool
+         workspace_invalid_project workspace_no_project workspace_project_limit
+         workspace_directory_required workspace_project_root_conflict workspace_project_not_found
+         workspace_file_changed workspace_pin_limit workspace_scope_changed
+         workspace_invalid_manifest workspace_snapshot_exists workspace_snapshot_limit
+         workspace_snapshot_not_found workspace_path_not_found workspace_symlink
+         hidden_or_traversal_path workspace_source_type_required workspace_inspection_rejected
+         workspace_invalid_relative_path workspace_file_byte_limit workspace_source_file_required))
       (atom_to_binary reason 'utf8) #B("native_evaluation_failed")))

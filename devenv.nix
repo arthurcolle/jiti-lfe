@@ -7,7 +7,7 @@ in {
   scripts.lfe-repl.exec = ''make build && python3 scripts/repl.py --lfe "$@"'';
   scripts.test-lfe.exec = "make test";
   scripts.experiment-reverse.exec = ''python3 scripts/experiment.py "$@"'';
-  scripts.image-repl.exec = ''python3 scripts/repl.py "$@"'';
+  scripts.image-repl.exec = ''python3 scripts/repl.py --legacy "$@"'';
   scripts.test.exec = "bash scripts/run-tests.sh test";
   scripts.test-stress.exec = ''TEST_SEED="''${TEST_SEED:-$(date +%s)}" bash scripts/run-tests.sh stress'';
   scripts.test-replay.exec = ''bash scripts/run-tests.sh replay "$@"'';

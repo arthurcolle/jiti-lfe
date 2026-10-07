@@ -48,7 +48,7 @@ Implementation: [typed adapters](../../scripts/lfe_plan_tools.py),
 [structured inspections](../../src/jiti_bridge.lfe).
 Verification: [actual native-tool scenarios](../../tests/lfe_native_plans.py),
 [explicit bounded live workflow](../../tests/lfe_native_plans_live.py),
-[retained live verification](../lfe-native-plans-verification-2026-10-06.md).
+[retained live verification](../verification/lfe-native-plans-verification-2026-10-06.md).
 Related: [plan admission](0020-lfe-plan-admission-and-verification.md),
 [owned processes](0021-lfe-owned-process-leases.md),
 [managed snapshots](0016-lfe-managed-snapshots.md).

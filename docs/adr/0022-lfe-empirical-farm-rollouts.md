@@ -39,7 +39,7 @@ Model billing uses the configured Responses lane; monetary charges are unknown.
 
 Implementation: [bounded runner and dispatcher](../../scripts/farm_rollouts.py).
 Verification: [real rollouts and dispatch denial](../../tests/lfe_farm_rollouts.py),
-[live evidence](../lfe-farm-verification-2026-10-06.md).
+[live evidence](../verification/lfe-farm-verification-2026-10-06.md).
 Reference: [retained video design](../../../agent-farm/docs/VIDEO_GROUNDED_FARM_DESIGN.md).
 Related: [owned actors](0021-lfe-owned-process-leases.md),
 [plan admission](0020-lfe-plan-admission-and-verification.md).

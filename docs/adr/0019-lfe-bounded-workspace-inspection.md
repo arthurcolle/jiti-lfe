@@ -30,5 +30,5 @@ operator evaluator still has ordinary Erlang file/process capabilities.
 
 Implementation: [workspace reader](../../src/jiti_workspace.lfe),
 [controller and tools](../../scripts/lfe_repl.py).
-Evidence: [actual Jiti reviews](../lfe-workspace-and-video-review.json).
+Evidence: [actual Jiti reviews](../evidence/lfe-workspace-and-video-review.json).
 Related: [LFE evaluation](0015-experimental-lfe-evaluation.md).

@@ -6,13 +6,13 @@ Jiti read DSCO plan/execution and agents.erl supervision sources through native
 workspace tools, saved `portfolio-review` at revision 3, then read the retained
 video design and current Persistent Episodes/Living Swarm documents. It saved
 `video-farm-review` and seven documented planning/process wrappers at revision 5.
-The exported [reviews](lfe-workspace-and-video-review.json) and
-[helpers](../examples/planning.lfe) preserve those actual model-produced artifacts.
+The exported [reviews](../evidence/lfe-workspace-and-video-review.json) and
+[helpers](../../examples/planning.lfe) preserve those actual model-produced artifacts.
 The earlier portfolio review's implementation-status describes its review-time
 state; the planner/process implementations and gates now exist separately.
 
 The exact video is `Gw_hnD7m00M`. The design is
-[Agent Farm: the population is the product](../../agent-farm/docs/VIDEO_GROUNDED_FARM_DESIGN.md).
+[Agent Farm: the population is the product](../../../agent-farm/docs/VIDEO_GROUNDED_FARM_DESIGN.md).
 The cached captions, normalized transcript and creator notes match the manifest's
 SHA-256 digests. This run reread that design; it does not claim a fresh visual review.
 
@@ -83,11 +83,11 @@ and explicit adoption subsequently published newer revisions.
 
 ## Artifacts and operation
 
-- [Live comparison and lineage](../.jiti/rollouts/20261006-empirical/index.html).
-- [Full retained report](../.jiti/rollouts/20261006-empirical/report.json).
-- [VM recovery proof](../.jiti/rollouts/20261006-empirical/runtime-recovery.json).
-- [Standalone actor startup](../../agents.erl/docs/PERSISTENT_JITI_ACTORS.md).
-- [Bounded runner](../scripts/farm_rollouts.py).
+- [Live comparison and lineage](../../.jiti/rollouts/20261006-empirical/index.html).
+- [Full retained report](../../.jiti/rollouts/20261006-empirical/report.json).
+- [VM recovery proof](../../.jiti/rollouts/20261006-empirical/runtime-recovery.json).
+- [Standalone actor startup](../../../agents.erl/docs/PERSISTENT_JITI_ACTORS.md).
+- [Bounded runner](../../scripts/farm_rollouts.py).
 
 The existing Farm keeps its native SQLite/controller ownership. Jiti's adapter
 is opt-in and owns standalone experiment identities. Remote identities persist;
@@ -107,8 +107,8 @@ ADRs 0019–0022 record these decisions and evidence boundaries.
 Jiti read this receipt through its terminal and saved `farm-rollout-observations`,
 `implementation-checkpoint` and `farm-observations/0` at revision 6. The original
 reviews remain historical. A fresh LFE VM reopened that image and recovered the
-accessor. Its exported [observations](lfe-farm-observations.json) and
-[accessor](../examples/farm-observations.lfe) retain the measured regression and
+accessor. Its exported [observations](../evidence/lfe-farm-observations.json) and
+[accessor](../../examples/farm-observations.lfe) retain the measured regression and
 missing-receipt uncertainty. The terminal writer was released for normal user chat.
 
 Final gates: `make test` passed all four LFE suites and 22 ADR validations;

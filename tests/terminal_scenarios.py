@@ -39,7 +39,7 @@ class Terminal:
         self.pid, self.fd = pty.fork()
         if not self.pid:
             os.chdir(ROOT)
-            os.execve(sys.executable, [sys.executable, str(ROOT / 'scripts/repl.py'), '--store', str(store), *extra], env)
+            os.execve(sys.executable, [sys.executable, str(ROOT / 'scripts/repl.py'), '--legacy', '--store', str(store), *extra], env)
         fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack('HHHH', 30, width, 0, 0))
         self.expect('chat')
 
@@ -287,7 +287,7 @@ def run():
             broken.close(eof=False, expected=2)
         finally:
             broken.close(eof=False, expected=2)
-        plain = subprocess.run([sys.executable, 'scripts/repl.py', '--plain', '--store', str(store)],
+        plain = subprocess.run([sys.executable, 'scripts/repl.py', '--legacy', '--plain', '--store', str(store)],
                                cwd=ROOT, input='/status\n/quit\n', text=True, capture_output=True, timeout=20)
         assert plain.returncode == 0 and 'X . 0' in plain.stdout and '\x1b' not in plain.stdout, plain.stdout + plain.stderr
     print('Terminal: real PTY editing, multiline history, paste, Unicode, pauses, recovery, rendering, probes, and plain mode passed')

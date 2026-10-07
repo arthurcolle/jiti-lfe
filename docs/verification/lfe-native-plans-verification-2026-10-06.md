@@ -11,10 +11,10 @@ versions and public receipts after successful changes. `/plans` discovers durabl
 plans after reopening. Model output defaults to 8192 tokens per request and is
 configurable up to 32768 with `--max-output-tokens`.
 
-Implementation: [adapters](../scripts/lfe_plan_tools.py),
-[chat interface](../scripts/lfe_repl.py),
-[structured controller inspection](../src/jiti_bridge.lfe).
-[ADR 0023](adr/0023-native-lfe-planning-tools.md) records the decision; prior
+Implementation: [adapters](../../scripts/lfe_plan_tools.py),
+[chat interface](../../scripts/lfe_repl.py),
+[structured controller inspection](../../src/jiti_bridge.lfe).
+[ADR 0023](../adr/0023-native-lfe-planning-tools.md) records the decision; prior
 ownership, verification and rollback decisions remain in force.
 
 ## Actual model workflows
@@ -44,9 +44,9 @@ evidence that the full Agent Farm population feedback loop exists. Token usage i
 retained in the reports; monetary charges are unknown.
 
 Retained reports:
-[initial run](../.jiti/native-plans-live-20261006-1/report.json),
-[final run](../.jiti/native-plans-live-20261006-2/report.json).
-Explicit runner: [live smoke](../tests/lfe_native_plans_live.py).
+[initial run](../../.jiti/native-plans-live-20261006-1/report.json),
+[final run](../../.jiti/native-plans-live-20261006-2/report.json).
+Explicit runner: [live smoke](../../tests/lfe_native_plans_live.py).
 
 ## Offline and required checks
 

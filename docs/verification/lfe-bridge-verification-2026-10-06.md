@@ -57,7 +57,7 @@ connect using native LFE tools, verify the registry and agent state, save only
 the endpoint and agent ID, and define `agents-status/0`. Successful tool results
 showed connection and remote state. The definition and managed endpoint were
 saved at revision 2 of `.jiti/agents-bridge`; the exact normalized definition was
-exported to [examples/agents-bridge.lfe](../examples/agents-bridge.lfe).
+exported to [examples/agents-bridge.lfe](../../examples/agents-bridge.lfe).
 
 After gracefully closing the first terminal, a fresh VM recovered that store:
 

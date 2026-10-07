@@ -1,7 +1,11 @@
 # 0015: Isolated experimental LFE evaluation
 
-Status: Accepted
+Status: Superseded
 Date: 2026-10-05
+Superseded by: [0027: LFE as the fork default](0027-lfe-fork-default.md)
+
+The successor changes backend selection in the LFE fork. The isolated evaluation
+and whole-action retry semantics below remain implemented.
 
 ## Context
 

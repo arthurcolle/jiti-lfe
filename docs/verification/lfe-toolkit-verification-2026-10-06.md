@@ -5,7 +5,7 @@ not evidence of population improvement or a complete farm behavioral loop.
 
 The chat catalogue now contains 55 native LFE tools plus 9 conversation-context
 tools. This change adds 31 native tools. The actual BEAM scenarios in
-[`tests/lfe_toolkit.py`](../tests/lfe_toolkit.py) invoke every addition and check
+[`tests/lfe_toolkit.py`](../../tests/lfe_toolkit.py) invoke every addition and check
 managed state, function results, job ownership, atomic failure and fresh-VM recovery.
 The full `make test` includes these scenarios, the prior kernel/planning/farm
 scenarios and the frontend context/display contracts. ADR validation passes with
@@ -15,7 +15,7 @@ these SBCL gates remain unverified.
 
 ## Bounded real model workflow
 
-[`tests/lfe_toolkit_live.py`](../tests/lfe_toolkit_live.py) uses real Responses
+[`tests/lfe_toolkit_live.py`](../../tests/lfe_toolkit_live.py) uses real Responses
 requests, capped at 24 requests and 22 model tool calls, with at most one owned
 job for this workflow. The owner supplies the exact function body, test cases,
 state key, job expression and note contents. Separate harness inspections check
@@ -63,6 +63,6 @@ exactly-once unmanaged effects before receipt publication.
 Discovery and dispatch respect advertised tools. Workspace tests reject traversal,
 absolute and hidden paths, reconstruct UTF-8 split across read chunks, and continue
 after capped matches. Notes and workspace text remain data rather than authority.
-The [contract review](lfe-toolkit-contract.md) lists bounds, adversarial cases and
-compatibility. [ADR 0024](adr/0024-typed-managed-toolkit.md) records the adapter
-decision; [ADR 0025](adr/0025-named-job-admission-fencing.md) records owner fencing.
+The [contract review](../lfe-toolkit-contract.md) lists bounds, adversarial cases and
+compatibility. [ADR 0024](../adr/0024-typed-managed-toolkit.md) records the adapter
+decision; [ADR 0025](../adr/0025-named-job-admission-fencing.md) records owner fencing.

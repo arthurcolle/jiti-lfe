@@ -1,0 +1,134 @@
+{
+  "status": "passed",
+  "model": "gpt-6-sol",
+  "requests": 16,
+  "request_ceiling": 30,
+  "tool_ceiling": 28,
+  "max_admitted_workers": 0,
+  "monetary_charges": "unknown",
+  "revision": 4,
+  "called_tools": [
+    "lfe_status",
+    "lfe_workspace_open",
+    "lfe_workspace_tree",
+    "lfe_workspace_grep",
+    "lfe_workspace_symbols",
+    "lfe_workspace_read_lines",
+    "lfe_workspace_read_lines",
+    "lfe_workspace_pin",
+    "lfe_workspace_pin",
+    "lfe_workspace_snapshot",
+    "lfe_workspace_context",
+    "lfe_workspace_diff",
+    "lfe_workspace_read_lines",
+    "lfe_workspace_context"
+  ],
+  "delta": {
+    "unchanged": false,
+    "changes": {
+      "unknown": [],
+      "removed": [],
+      "added": [
+        {
+          "path": "src/added.py",
+          "sha256": "bb192bf056f0eccec9b8ac859dd9274c42082beb46c19b6f4341f9574636093b"
+        }
+      ],
+      "changed": [
+        {
+          "path": "src/engine.py",
+          "after_sha256": "b9a950ffc2da6a046a2b7e4a0b51a604565daed6470b17003b3d924c04d2bcbc",
+          "before_sha256": "0c6c60316a4cdce07f5cfa67617d7112a0bfe904ccbe274bbcc885bc9003783c"
+        }
+      ]
+    },
+    "coverage": {
+      "complete": true,
+      "skipped": [],
+      "bytes_read": 175,
+      "excluded": [],
+      "limits_hit": [],
+      "excluded_directories": [
+        "__pycache__",
+        "_build",
+        "artifacts",
+        "build",
+        "dist",
+        "node_modules",
+        "target",
+        "vendor",
+        "venv"
+      ],
+      "scanned_files": 3,
+      "scope_path": ""
+    },
+    "baseline_complete": true,
+    "comparison_complete": true,
+    "snapshot_id": "baseline"
+  },
+  "evidence_bundle": {
+    "truncated": false,
+    "project": {
+      "id": "engine-demo",
+      "root": "jiti/tests/workspace-live-fixture-33q0y8pi",
+      "description": "Source and contract inspection",
+      "title": "Engine demo",
+      "pins": [
+        {
+          "label": "Implementation",
+          "path": "src/engine.py",
+          "bytes": 106,
+          "sha256": "0c6c60316a4cdce07f5cfa67617d7112a0bfe904ccbe274bbcc885bc9003783c",
+          "pinned_from_revision": 1
+        },
+        {
+          "label": "Acceptance",
+          "path": "docs/contract.md",
+          "bytes": 47,
+          "sha256": "b7ace5b2e2f82e4201f6f787089e24c2fd5190590cedf3a33ddb9508fe564ebf",
+          "pinned_from_revision": 2
+        }
+      ],
+      "snapshots": [
+        {
+          "complete": true,
+          "id": "baseline",
+          "manifest_hash": "D5095896EF91420481F76A0ABC2E4AE5701D61FD6DD7A206F841EDA8219BEC78",
+          "file_count": 2
+        }
+      ]
+    },
+    "evidence_only": true,
+    "files": [
+      {
+        "label": "Implementation",
+        "path": "src/engine.py",
+        "sha256": "b9a950ffc2da6a046a2b7e4a0b51a604565daed6470b17003b3d924c04d2bcbc",
+        "evidence_only": true,
+        "content": "class Engine:\n    def run(self, x):\n        return x * 3\n\ndef apply_engine(x):\n    return Engine().run(x)",
+        "end_line": 6,
+        "start_line": 1,
+        "changed_since_pin": true,
+        "excerpt_truncated": false
+      },
+      {
+        "label": "Acceptance",
+        "path": "docs/contract.md",
+        "sha256": "b7ace5b2e2f82e4201f6f787089e24c2fd5190590cedf3a33ddb9508fe564ebf",
+        "evidence_only": true,
+        "content": "# Engine contract\nEngine.run(x) returns x * 2.",
+        "end_line": 2,
+        "start_line": 1,
+        "changed_since_pin": false,
+        "excerpt_truncated": false
+      }
+    ],
+    "skipped": []
+  },
+  "no_source_execution": true,
+  "recovered_project_and_pins": true,
+  "no_job_replay": true,
+  "tool_calls": 14,
+  "source_report": ".jiti/workspace-live-20261006-native-1/report.json",
+  "implementation": "native LFE project operations"
+}

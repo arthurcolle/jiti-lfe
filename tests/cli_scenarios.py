@@ -10,7 +10,7 @@ import tempfile
 import threading
 
 root = Path(__file__).resolve().parents[1]
-launcher = [sys.executable, str(root / 'scripts/repl.py')]
+launcher = [sys.executable, str(root / 'scripts/repl.py'), '--legacy']
 
 def run(args, text, env=None, code=0):
     result = subprocess.run([*launcher, *args], input=text, text=True, capture_output=True,

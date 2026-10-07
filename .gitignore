@@ -1,32 +1,20 @@
-# Devenv
+# Local development environments
 .devenv*
 devenv.local.nix
 devenv.local.yaml
-
-# direnv
-.direnv
-
-# pre-commit
+.direnv/
 .pre-commit-config.yaml
 
-# Devenv
-.devenv*
-devenv.local.nix
-devenv.local.yaml
-
-# direnv
-.direnv
-
-# pre-commit
-.pre-commit-config.yaml
-
-# Local Lisp worlds and compiled artifacts
-.image-agent/
-*.fasl
-__pycache__/
-_build/
+# Durable local stores, worker transcripts and generated code
 .jiti/
+.image-agent/
+.swarm/
+_build/
 erl_crash.dump
+__pycache__/
+*.fasl
 
-# Rebuildable launch media (sources and scripts live in launch/).
+# Disposable inspection fixtures and rebuildable launch media
+tests/workspace-fixture-*/
+tests/workspace-live-fixture-*/
 artifacts/launch/

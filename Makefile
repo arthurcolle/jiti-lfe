@@ -1,4 +1,4 @@
-.PHONY: all build test repl test-kernel check-adrs
+.PHONY: all build test repl chat test-kernel check-adrs
 
 all: build
 
@@ -10,6 +10,8 @@ test: build
 	python3 tests/lfe_diagnostics.py
 	python3 tests/lfe_native_plans.py
 	python3 tests/lfe_toolkit.py
+	python3 tests/lfe_workspace.py
+	python3 tests/lfe_launcher.py
 	python3 tests/lfe_tool_limit_test.py
 	python3 tests/lfe_display_test.py
 	python3 tests/test_lfe_chat_compaction.py
@@ -19,7 +21,10 @@ test: build
 	python3 scripts/check-adrs.py
 
 repl: build
-	python3 scripts/repl.py --lfe
+	python3 scripts/repl.py
+
+chat: build
+	python3 scripts/repl.py --mode chat
 
 test-kernel:
 	devenv shell test

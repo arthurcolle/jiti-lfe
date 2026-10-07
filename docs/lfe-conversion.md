@@ -1,9 +1,11 @@
-# Experimental LFE backend
+# LFE backend
 
-The default Jiti kernel is still SBCL. The LFE backend is a working experiment
-selected through `--lfe` or `make repl`. It uses a separate store and repair model.
-See [ADR 0015](adr/0015-experimental-lfe-evaluation.md) and
-[ADR 0016](adr/0016-lfe-managed-snapshots.md).
+LFE is the default backend in this fork: `make repl` starts manual evaluation and
+`make chat` starts normal chat. `--lfe` remains compatible; `--legacy` explicitly
+selects the inherited [SBCL backend](sbcl.md). The stores and repair models remain
+separate. See [ADR 0027](adr/0027-lfe-fork-default.md), the original isolated
+evaluation decision [0015](adr/0015-experimental-lfe-evaluation.md), and
+[managed persistence](adr/0016-lfe-managed-snapshots.md).
 
 ## Build and run
 
@@ -99,12 +101,14 @@ python3 tests/lfe_native_plans_live.py --output .jiti/native-plans-live-NEW
 The smoke has at most 18 model tool calls and 20 Responses requests. Use a fresh
 output directory; a previous workflow is never resumed automatically. Monetary
 charges remain unknown. [ADR 0023](adr/0023-native-lfe-planning-tools.md) records
-the adapter decision; [live verification](lfe-native-plans-verification-2026-10-06.md)
+the adapter decision; [live verification](verification/lfe-native-plans-verification-2026-10-06.md)
 retains the observed workflow, initial failures and recovery evidence.
 
 ## Expanded native toolkit
 
-Normal chat now includes 55 native LFE tools, plus 9 conversation-context tools.
+Normal chat now includes 69 native LFE tools, plus 9 conversation-context tools.
+The [project workspace](workspace.md) adds 14 tools for saved project selection,
+pins, code maps, source evidence, digest baselines and observed changes.
 The 31 additions below use the same evaluator, snapshot store and owned process
 manager. Their advertised names have an `lfe_` prefix; ordinary prompts need no
 special syntax.
@@ -172,7 +176,7 @@ actual code, cases, result and single job, then reopens the store and checks tha
 no jobs were replayed. Use a fresh output directory. See the
 [contract review](lfe-toolkit-contract.md), [typed-tool ADR](adr/0024-typed-managed-toolkit.md)
 and [named-job ADR](adr/0025-named-job-admission-fencing.md).
-The [verification receipt](lfe-toolkit-verification-2026-10-06.md) records the
+The [verification receipt](verification/lfe-toolkit-verification-2026-10-06.md) records the
 observed model workflow, retained initial harness failure and recovery checks.
 
 ## Managed evaluation and explicit repair
@@ -271,7 +275,7 @@ after reopening; connections themselves are not persisted. It reads state and
 does not enable autonomy or send chat tasks. Distribution and remote effects
 remain outside managed rollback. This is a local status bridge, not a distributed
 transaction or a full agents.erl application launch. See the
-[live verification receipt](lfe-bridge-verification-2026-10-06.md).
+[live verification receipt](verification/lfe-bridge-verification-2026-10-06.md).
 
 ## Current boundaries
 
@@ -314,7 +318,7 @@ recovery, immutable tool grants and denied child-tool dispatch. Use `/plan ID` f
 structured inspection. [Planning helpers](../examples/planning.lfe) were developed
 by Jiti after it read the DSCO source and retained video design.
 
-See [the live farm receipt](lfe-farm-verification-2026-10-06.md) for the six tool
+See [the live farm receipt](verification/lfe-farm-verification-2026-10-06.md) for the six tool
 variants, fresh descendant comparison and seven-actor restart proof. The explicit
 runner is `scripts/farm_rollouts.py`; it never schedules itself after recovery.
 
